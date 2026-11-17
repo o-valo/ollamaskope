@@ -1,191 +1,183 @@
-# Ollamaskope – Modelliste eines Ollama-Endpunkts als Web-Werkzeug
+# Ollamaskope – model list of an Ollama endpoint as a web tool
 
-> Bis 17.11.2026 hieß das Werkzeug `ollama-sort`. Verzeichnis, Programm und
-> Kurzbefehl heißen jetzt `ollamaskope`; die alten Konfigurationsdateien
-> `ollama-sort.conf` / `ollama-sort.env` und die alten Umgebungsvariablen
-> `OLLAMA_SORT_*` gelten weiter.
+> Until 17 Nov 2026 this tool was called `ollama-sort`. Directory, program and
+> shortcut are now `ollamaskope`; the old configuration files
+> `ollama-sort.conf` / `ollama-sort.env` and the old `OLLAMA_SORT_*`
+> environment variables keep working.
 
-Zeigt die Modelle eines entfernten (oder lokalen) Ollama-Endpunkts, baut aus
-jedem Modell ein portables Modelfile, erzeugt daraus ein neues Modell und
-löscht Modelle. Reines Python 3 (Standardbibliothek), kein Flask, keine
-Node-Abhängigkeiten – dasselbe Muster wie `~/wg-watcher/wg-http.py`.
+Shows the models of a remote (or local) Ollama endpoint, turns any model into a
+portable Modelfile, builds a new model from it, deletes models and rolls one out
+onto another endpoint. Pure Python 3 (standard library), no Flask, no
+Node dependencies – the same pattern as `~/wg-watcher/wg-http.py`.
 
-Das Werkzeug rechnet nicht und läuft deshalb nicht auf einem Inferenz-Host
-(§5b der Wissensdatei). Es spricht nur die Ollama-API über HTTP.
+German original: [README.ger.md](README.ger.md)
 
-English: [README.en.md](README.en.md)
+The tool does not run inference and therefore does not belong on an inference
+host. It only talks to the Ollama API over HTTP.
 
 ## Installation
 
 ```bash
 cd ~/ollamaskope
-./install.sh                # prüfen und einrichten
-./install.sh --start        # einrichten und gleich starten
-./install.sh --check        # nur prüfen, nichts ändern
+./install.sh                # check and set up
+./install.sh --start        # set up and start right away
+./install.sh --check        # check only, change nothing
 ```
 
-Der Installer prüft `python3` (mindestens 3.8) und `curl`, setzt die
-Ausführungsrechte, legt `config.json` aus `config.example.json` an – eine
-vorhandene `config.json` bleibt unangetastet – und schreibt den Kurzbefehl
-`~/.local/bin/ollamaskope`, der `start|stop|restart|status` weiterreicht
-(`--ohne-befehl` lässt ihn weg).
+The installer checks `python3` (3.8 or newer) and `curl`, sets the executable
+bits, creates `config.json` from `config.example.json` – an existing
+`config.json` is left untouched – and writes the shortcut
+`~/.local/bin/ollamaskope`, which forwards `start|stop|restart|status`
+(`--ohne-befehl` skips it).
 
-**Kein venv.** Das Werkzeug benutzt nur die Python-Standardbibliothek
-(`http.server`, `urllib`, `json`, `threading`); ein venv wäre eine leere Hülle
-mit einer zusätzlichen Fehlerquelle. Wenn später eine `requirements.txt`
-auftaucht, legt `install.sh` `.venv` an und installiert sie; `ollamaskope.sh`
-nimmt dann automatisch `.venv/bin/python` (`OLLAMASKOPE_OHNE_VENV=1` schaltet
-das ab).
+**No venv.** The tool uses only the Python standard library (`http.server`,
+`urllib`, `json`, `threading`); a venv would be an empty shell with one more
+thing to break. If a `requirements.txt` ever appears, `install.sh` creates
+`.venv` and installs it; `ollamaskope.sh` then prefers `.venv/bin/python`
+(`OLLAMASKOPE_OHNE_VENV=1` turns that off).
 
-## Installation im LAN per curl
+## Installing over the LAN with curl
 
-Läuft der Dienst auf einem Host im LAN, genügt auf einem anderen Rechner
-eine Zeile – Paket und Installer kommen von dort:
+If the service runs on a host in your LAN, one line on another machine is
+enough – package and installer come from that host:
 
 ```bash
 curl -fsSL http://127.0.0.1:8090/get.sh | sh
 ```
 
-Das Skript fragt, ob der Dienst nur lokal (`127.0.0.1`) oder im LAN
-(`0.0.0.0`) lauschen soll, entpackt nach `~/ollamaskope`, ruft `install.sh`
-auf und fragt am Ende, ob gestartet werden soll. Ohne Terminal (etwa aus
-einem Skript) bleibt `config.json` unverändert und es wird nicht gestartet:
+The script asks whether the service should listen on `127.0.0.1` only or on
+`0.0.0.0` in the LAN, unpacks to `~/ollamaskope`, runs `install.sh` and finally
+asks whether to start it. Without a terminal (from a script, for example)
+`config.json` stays unchanged and nothing is started:
 
 ```bash
 curl -fsSL http://127.0.0.1:8090/get.sh | sh -s -- --bind 0.0.0.0 --start
 ```
 
-Optionen: `--bind 127.0.0.1|0.0.0.0`, `--quelle URL` (anderes Paket),
-`--ziel PFAD`, `--start`, `--ohne-start`, `--hilfe`. Ein zweiter Lauf ist ein
-Update: Programm und Oberfläche werden ersetzt, `config.json` und
-`ollamaskope.conf` bleiben stehen.
+Options: `--bind 127.0.0.1|0.0.0.0`, `--quelle URL` (another package),
+`--ziel PATH`, `--start`, `--ohne-start`, `--hilfe`. A second run is an update:
+program and UI are replaced, `config.json` and `ollamaskope.conf` survive.
 
-Das Paket entsteht mit `./paket-bauen.sh` und liegt dann als
-`static/ollamaskope.tar.gz` bereit (ohne `config.json`, PID-/Logdateien,
-`.venv`). Nach Änderungen am Programm einmal neu bauen:
+The package is produced by `./paket-bauen.sh` and lands in
+`static/ollamaskope.tar.gz` (without `config.json`, PID/log files, `.venv`).
+Rebuild it after changing the program:
 
 ```bash
-./paket-bauen.sh            # danach: curl …/get.sh | sh
+./paket-bauen.sh            # then: curl …/get.sh | sh
 ```
 
-## Start
+## Running
 
 ```bash
 cd ~/ollamaskope
-./ollamaskope.sh start      # startet im Hintergrund, prüft /api/gesundheit
+./ollamaskope.sh start      # starts in the background, checks /api/gesundheit
 ./ollamaskope.sh status
 ./ollamaskope.sh stop
 ```
 
-Danach im Browser: **http://127.0.0.1:8090/**
+Then open **http://127.0.0.1:8090/**
 
-Ohne Startskript (blockiert das Terminal):
+Without the start script (blocks the terminal):
 
 ```bash
 python3 ollamaskope.py --port 8090
 ```
 
-## Bedienung
+## Usage
 
-| Schritt | Was passiert |
+| Step | What happens |
 |---|---|
-| Endpunkt wählen | Liste kommt von `/api/tags`, geladene Modelle werden markiert |
-| **Modelfile** | `/api/show` wird zu einem bearbeitbaren Modelfile; „Als Datei“ speichert es als `Modelfile` |
-| Namen eintragen, **Modell erzeugen** | `/api/create` läuft streamend, Fortschritt steht im Log |
-| **Löschen** | erst wenn ein Modell geöffnet ist: Knopf am Modelfile-Editor und in der Abhängigkeitsübersicht; eine Nachfrage nennt das Modell, „Ja, löschen“ schickt `/api/delete` |
-| **Ausrollen** | Modell öffnen, „⇄ Ausrollen“: Ziel-Endpunkt und Name wählen. Übertragen wird das Rezept (FROM, Parameter, Template, System), nicht die Gewichte – die Basis muss auf dem Ziel liegen oder auf Wunsch vorher gezogen werden |
-| **Laden / Entladen** | je Zeile: lädt ein Modell in den Speicher (`keep_alive` 30 min) oder nimmt es heraus (`keep_alive` 0) – das Gegenstück zu `ollama run` |
-| **Modell anklicken** | Übersicht: worauf es aufbaut, welche Modelle darauf aufbauen, Geschwister – mit „Dieses Modell löschen“ |
-| **Spaltenkopf anklicken** | sortiert nach Modell, Größe, Familie, Parameterzahl, Quantisierung oder Änderungsdatum; zweiter Klick dreht um, dritter stellt die Server-Reihenfolge wieder her |
-| **＋ Endpunkt** | neuen Endpunkt mit Name und URL eintragen (URL wird vorher geprüft) oder einen entfernen; beides landet in `config.json` |
+| Pick an endpoint | list comes from `/api/tags`, loaded models are marked |
+| **Modelfile** | `/api/show` becomes an editable Modelfile; “Als Datei” saves it as `Modelfile` |
+| Enter a name, **Modell erzeugen** | `/api/create` streams its progress into the log |
+| **Delete** | only once a model is open: button in the Modelfile editor and in the dependency view; a confirmation names the model, “Ja, löschen” sends `/api/delete` |
+| **Roll out** | open a model, “⇄ Ausrollen”: pick target endpoint and name. The recipe is transferred (FROM, parameters, template, system), not the weights – the base must be present on the target or is pulled there first |
+| **Load / unload** | per row: load a model into memory (`keep_alive` 30 min) or drop it (`keep_alive` 0) – the counterpart of `ollama run` |
+| **Click a model** | overview: what it is built on, what is built on it, siblings – with “Dieses Modell löschen” |
+| **Click a column head** | sorts by model, size, family, parameter count, quantisation or date; a second click reverses, a third restores server order |
+| **＋ Endpunkt** | add an endpoint by name and URL (URL is checked first) or remove one; both end up in `config.json` |
 
-Jeder Lade- und Entladeversuch landet zusätzlich in `laden.log` neben dem
-Programm – eine Zeile je Versuch, mit Tabulatoren getrennt:
+Every load and unload attempt is also appended to `laden.log` next to the
+program – one tab-separated line per attempt:
 
 ```text
 2026-11-17T02:13:54	laden	fake	http://127.0.0.1:11434	klein:latest	1.84s	ok done_reason=load
 ```
 
-Der Reihe nach: Zeit, Aktion (`laden`/`entladen`), Endpunktname, Endpunkt-URL,
-Modell, Dauer, Ergebnis. Fehlschläge stehen als `fehler: …` darin – genau sie
-beantworten später die Frage, warum ein 200 ankam und trotzdem nichts im
-Speicher lag. Die Zugriffszeilen in `ollamaskope.log` sagen das nicht.
+In order: time, action (`laden`/`entladen`), endpoint name, endpoint URL, model,
+duration, result. Failures appear as `fehler: …` – they are the lines that later
+answer why a 200 came back while nothing was actually in memory. The access
+lines in `ollamaskope.log` do not tell you that.
 
-Die Aktionsknöpfe jeder Zeile stehen in der **ersten Spalte links**, vor dem
-Modellnamen – bei schmalem Fenster bleiben sie sichtbar, ohne seitlich zu
-scrollen. Die Modelfile-Karte klappt über ihre Überschrift auf und zu
-(„▾ einklappen“ / „▸ ausklappen“); ein Klick auf „Modelfile“ in der Liste klappt
-sie auf.
+The action buttons of each row sit in the **first column, on the left**, ahead of
+the model name – in a narrow window they stay visible without sideways
+scrolling. The Modelfile card folds open and shut via its heading
+(“▾ einklappen” / “▸ ausklappen”); clicking “Modelfile” in the list unfolds it.
 
-Beim Modelfile ersetzt das Werkzeug Blob-Pfade:
+For the Modelfile the tool replaces blob paths:
 
 ```text
-FROM /usr/share/ollama/.ollama/models/blobs/sha256-…   ← so antwortet /api/show
-FROM qwen-test:7b                                      ← so steht es im Editor
+FROM /usr/share/ollama/.ollama/models/blobs/sha256-…   ← what /api/show returns
+FROM qwen-test:7b                                      ← what the editor shows
 ```
 
-Für die Abhängigkeiten zählt dagegen **nicht** der Kommentar, sondern
-`details.parent_model`: der `# FROM`-Hinweis nennt immer das Modell selbst
-(„so baust du eine Kopie“). `GET /api/abhaengigkeiten?endpunkt=…&modell=…`
-fragt `/api/show` für alle Modelle des Endpunkts parallel ab und antwortet mit
-`baut_auf`, `darauf_bauen`, `geschwister` und `basis` (`modell`, `extern`,
-`datei` oder `registry`). Das Ergebnis wird 120 s gehalten und nach Erzeugen
-oder Löschen verworfen.
+The dependency view does **not** trust that comment but `details.parent_model`:
+the `# FROM` hint always names the model itself (“this is how you build a copy”).
+`GET /api/abhaengigkeiten?endpunkt=…&modell=…` asks `/api/show` for every model
+of the endpoint in parallel and answers with `baut_auf`, `darauf_bauen`,
+`geschwister` and `basis` (`modell`, `extern`, `datei` or `registry`). The result
+is cached for 120 s and dropped after a create or delete.
 
-Ollama selbst schreibt den Hinweis `# FROM <name>` mit; er wird bevorzugt,
-danach `details.parent_model`, zuletzt der Modellname. Ein zweites `FROM`
-(Projektor) wird entfernt und als Hinweis angezeigt – `/api/create` nimmt nur
-ein `FROM`.
+A second `FROM` line (projector) is dropped and reported as a note –
+`/api/create` accepts only one `FROM`.
 
-## Modelle ausrollen
+## Rolling out models
 
-Ein Modell auf einem weiteren Endpunkt bereitstellen: Modell öffnen, „⇄ Ausrollen“,
-Ziel und Namen wählen. Was dabei passiert, hängt davon ab, worauf das Modell
-beruht – `details.parent_model` entscheidet (der `# FROM`-Kommentar nennt
-immer das Modell selbst und taugt nicht):
+Open a model, click “⇄ Ausrollen”, choose target and name. What happens depends on
+what the model is built on; `details.parent_model` decides:
 
-| Fall | `parent_model` | Was das Werkzeug tut |
+| Case | `parent_model` | What the tool does |
 |---|---|---|
-| aus der Registry geladen | leer | zieht dasselbe Modell auf dem Ziel (`/api/pull`) – das ergibt dieselben Gewichte. Anderer Zielname: danach `/api/copy` |
-| aus einem anderen Modell gebaut | Modellname | `/api/create` mit `FROM <Elternteil>` plus Parameter, Template, System – die Gewichte kommen von der Basis, die auf dem Ziel liegen muss (Häkchen „Basis bei Bedarf ziehen“ lädt sie vorher) |
-| aus einer GGUF-Datei gebaut | Dateiname | gesperrt, solange das Feature `gguf` aus ist (Standard). Freigeschaltet: `/api/create` aus einer GGUF, die **auf dem Ziel** liegt – kopiert wird nichts |
+| pulled from a registry | empty | pulls the same model on the target (`/api/pull`) – that yields the same weights. Different target name: `/api/copy` afterwards |
+| built from another model | a model name | `/api/create` with `FROM <parent>` plus parameters, template, system – weights come from the base, which must be present on the target (tick “Basis bei Bedarf ziehen” to pull it first) |
+| built from a GGUF file | a file name | locked while the `gguf` feature is off (default). Once enabled: `/api/create` from a GGUF that sits **on the target** – nothing is copied |
 
-Ein Ausrollen überschreibt nie: ist der Zielname dort belegt, bricht das Werkzeug
-mit einem Hinweis ab. Am 16.11.2026 an echten Endpunkten geprüft: auf ollama-3 baut
-`codehamr-agent:latest` auf `Julioa/Qwen3.8-27B-UD-Q3_K_XL` auf (ausrollbar,
-wo diese Basis liegt), `bonsai-2:27b` trägt `bonsai-2:27b-q2_0` als Elternteil,
-und `qwen3.5:9b` hat gar keinen – das wird gezogen, nicht neu gebaut.
+A rollout never overwrites: if the target name is taken, the tool stops with a
+message. Measured on 2026-11-16 against real endpoints: `codehamr-agent:latest`
+on ollama-3 is built on `Julioa/Qwen3.8-27B-UD-Q3_K_XL` (rollable out wherever that
+base is present), `bonsai-2:27b` carries `bonsai-2:27b-q2_0` as its parent, and
+`qwen3.5:9b` has no parent at all – that one is pulled, not rebuilt.
 
-Bei einem Modell ohne Elternteil braucht das Ausrollen **keinen Zugriff auf die
-Dateien der Quelle**: das Ziel zieht dasselbe Modell selbst aus der Registry und
-bekommt damit dieselben Gewichte – vollständig, ohne SSH, ohne Blob-Kopie.
+For a model without a parent, rolling out needs no access to the source host's
+files at all: the target pulls the same model from the registry itself, so the
+weights arrive there identically and completely on their own.
 
-### GGUF-Modelle ausrollen (Feature, nicht Normalbetrieb)
+### Rolling out GGUF models (feature, not normal operation)
 
-Ist ein Modell aus einer GGUF-Datei gebaut, liegen seine Gewichte nur als Datei
-vor – die API liefert sie nicht. Dieser Fall ist selten und deshalb
-**standardmäßig gesperrt**; freigeschaltet wird er bewusst in der Konfiguration:
+If a model was built from a GGUF file, its weights exist only as a file – the
+API does not hand them out. That case is rare and therefore **locked by
+default**; it is enabled deliberately in the configuration:
 
 ```json
 {"gguf": true}
 ```
 
-oder in `ollamaskope.conf`:
+or in `ollamaskope.conf`:
 
 ```text
 gguf = ja
 ```
 
-Dann baut das Werkzeug das Modell auf dem Ziel per `/api/create` aus einem
-GGUF-Pfad, der **dort schon liegt** – kopiert wird nichts. Liegt die Datei auf
-dem Ziel woanders, im Dialog unter „GGUF-Pfad auf dem Ziel“ eintragen. Fehlt sie
-dort, antwortet Ollama mit seinem Fehler und das Werkzeug reicht ihn durch.
+Then the tool builds the model on the target via `/api/create` from a GGUF path
+that already exists **there** – nothing is copied. If the file lives elsewhere on
+the target, enter it in the dialog under “GGUF-Pfad auf dem Ziel”. If it is
+missing, Ollama answers with its error and the tool passes it through.
 
-Gewichte wandern nie zwischen zwei Hosts: Ollama hat keinen Weg, Blobs
-auszuliefern. Ohne Dateizugriff (SSH/scp, geteiltes Verzeichnis) lässt sich ein
-aus einer GGUF-Datei gebautes Modell gar nicht bewegen.
+Weights never travel between two hosts: Ollama offers no endpoint for blob
+downloads. Without file access (SSH/scp, a shared directory) a model built from
+a GGUF file cannot be moved at all.
 
-## Konfiguration (`config.json`)
+## Configuration (`config.json`)
 
 ```json
 {
@@ -197,90 +189,86 @@ aus einer GGUF-Datei gebautes Modell gar nicht bewegen.
      "url": "http://10.0.0.24:11434", "schreiben": true}
   ]
 }
-```
+```* `schreiben: false` locks create, delete and rolling out for that endpoint; the
+UI disables the buttons and the server answers 403.
+* Read-only by default: **ollama-2** (a model stays loaded there permanently,
+  deleting it would break work in progress) and **ollama-3** (experiments in progress).
+* Set `bind: 0.0.0.0` deliberately: there is **no login**.
+* `"gguf": true` unlocks rolling out from GGUF files – off by default, because
+  it is a special case, not normal operation (see below).
 
-* `schreiben: false` sperrt Erzeugen und Löschen für diesen Endpunkt; die
-  Oberfläche deaktiviert die Knöpfe, der Server antwortet mit 403.
-* Voreingestellt schreibgeschützt: **ollama-2** (dort bleibt ein Modell dauerhaft
-  geladen, Löschen würde dort laufende Arbeit brechen) und **ollama-3** (dort laufen
-  laufende Experimente).
-* `bind: 0.0.0.0` nur bewusst setzen: es gibt **keine Anmeldung**.
-* `"gguf": true` schaltet das Ausrollen aus GGUF-Dateien frei – Vorgabe ist
-  aus, weil das ein Sonderfall ist und keine Grundeinstellung (siehe unten).
+## Simple configuration (`ollamaskope.conf`)
 
-## Einfache Konfiguration (`ollamaskope.conf`)
-
-Wer keine JSON-Datei pflegen will, legt daneben eine zeilenweise Datei an –
-`ollamaskope.conf` oder `ollamaskope.env`, gleicher Aufbau:
+If you would rather not maintain a JSON file, put a line-based file next to it –
+`ollamaskope.conf` or `ollamaskope.env`, same layout:
 
 ```text
-# Kommentar, Leerzeilen zählen nicht
+# comment, blank lines are ignored
 bind = 0.0.0.0
 port = 8090
 timeout = 25
 
-# name | url | rechte      (rechte: schreiben oder lesen)
+# name | url | rights       (rights: schreiben or lesen)
 endpunkt = ollama-1 | http://10.0.0.24:11434 | schreiben
 endpunkt = ollama-2    | http://10.0.0.81:11434 | lesen
-endpunkt = http://10.0.0.79:11434        # Name kommt aus der Adresse
+endpunkt = http://10.0.0.79:11434        # name is taken from the address
 ```
 
-* `=` oder `:` trennen Schlüssel und Wert; `OLLAMASKOPE_BIND=…` wird ebenso
-  verstanden. Unbekannte Schlüssel sind ein Fehler **mit Zeilennummer** – nichts
-  wird stillschweigend ignoriert.
-* Reihenfolge der Suche: `--einfach PFAD`, dann `$OLLAMASKOPE_EINFACH`, sonst
-  `ollamaskope.conf` bzw. `ollamaskope.env` neben `config.json`.
-* **Diese Datei hat Vorrang.** Ihre Werte überschreiben `bind`, `port` und
-  `timeout`; ihre Endpunkte stehen vorn. Endpunkte aus `config.json` kommen
-  hinzu, solange ihre URL nicht schon in der einfachen Datei steht.
-* Endpunkte aus der Datei sind im Web-Dialog mit „aus ollamaskope.conf“
-  markiert und dort **nicht** entfernbar – sie gehören in die Datei. Neue
-  Endpunkte aus dem Web landen weiterhin in `config.json`; beim Speichern
-  werden die Datei-Endpunkte nicht hineingeschrieben (keine Doppelung).
-* Prüfen ohne Start: `python3 ollamaskope.py --pruefen` (zeigt Quelle, Bind,
-  Port und jeden Endpunkt mit Rechten; Exit 3 bei Fehler).
+* `=` or `:` separate key and value; `OLLAMASKOPE_BIND=…` is understood too.
+  Unknown keys are an error **with the line number** – nothing is silently
+  ignored.
+* Lookup order: `--einfach PATH`, then `$OLLAMASKOPE_EINFACH`, otherwise
+  `ollamaskope.conf` / `ollamaskope.env` next to `config.json`.
+* **This file wins.** Its values override `bind`, `port` and `timeout`, its
+  endpoints come first. Endpoints from `config.json` are appended as long as
+  their URL is not already in the simple file.
+* Endpoints from the file are marked “aus ollamaskope.conf” in the web dialog
+  and cannot be removed there – they belong in the file. New endpoints from the
+  web still go to `config.json`; when saving, file endpoints are not written
+  into it (no duplicates).
+* Check without starting: `python3 ollamaskope.py --pruefen` (shows source,
+  bind, port and every endpoint with its rights; exit 3 on error).
 
-## Warum das Modelfile zerlegt wird
+## Why the Modelfile is split up
 
-Ollama 0.40.14 nimmt das früher übliche Feld `modelfile` nicht mehr an. Probe
-vom 16.11.2026 gegen `10.0.0.24` – alle drei Varianten antworten:
+Ollama 0.40.14 no longer accepts the former `modelfile` field. Probe from
+2026-11-16 against `10.0.0.24` – all three variants answer:
 
 ```json
 {"error":"neither 'from' or 'files' was specified"}
 ```
 
-Deshalb zerlegt `ollamaskope.py` den Text selbst und sendet `model`, `from`,
-`parameters`, `system`, `template`, `license`, `renderer`, `parser` und
-`adapters`. Unbekannte Anweisungen (z. B. `MESSAGE`) werden **nicht**
-stillschweigend verworfen, sondern als Fehler gemeldet.
+Therefore `ollamaskope.py` parses the text itself and sends `model`, `from`,
+`parameters`, `system`, `template`, `license`, `renderer`, `parser` and
+`adapters`. Unknown directives (e.g. `MESSAGE`) are **not** silently dropped but
+reported as an error.
 
-## Grenzen
+## Limits
 
-* `FROM` muss ein Modell (oder eine Datei) sein, das auf dem Zielserver liegt.
-  Ein neues Modell mit denselben Gewichten entsteht über `FROM <vorhandenes
-  Modell>`; heruntergeladen wird nichts. Beim Ausrollen wird deshalb nur das
-  Rezept übertragen, nie ein Blob.
-* Kein Anlegen per Upload einer lokalen GGUF-Datei.
-* Keine Anmeldung, keine Benutzerverwaltung. Schreibende Wege verlangen den
-  Kopf `X-Anfrage: ollamaskope` (Schutz gegen fremde Formularseiten), das ist
-  kein Ersatz für eine Anmeldung.
-* `renderer`/`parser` werden mitgesendet; ob eine Ollama-Version sie beim
-  Erzeugen beachtet, ist nicht geprüft.
+* `FROM` must be a model (or a file) that exists on the target server. A new
+  model with the same weights is created via `FROM <existing model>`; nothing is
+  downloaded. Rolling out therefore transfers a recipe, never a blob.
+* No creating by uploading a local GGUF file.
+* No login, no user management. Writing routes require the header
+  `X-Anfrage: ollamaskope` (protection against foreign form pages), which is no
+  substitute for authentication.
+* `renderer`/`parser` are sent along; whether a given Ollama version honours them
+  while creating has not been verified.
 
 ## Tests
 
-Die Schreibwege werden gegen `tests/fake-ollama.py` geprüft – ein
-Ollama-Ersatz, der wie 0.40.14 das rohe `modelfile`-Feld ablehnt:
+The writing paths are tested against `tests/fake-ollama.py` – an Ollama stand-in
+that rejects the raw `modelfile` field just like 0.40.14:
 
 ```bash
 cd ~/ollamaskope
 python3 -m unittest discover -s tests -v
 ```
 
-Zurzeit sind es 39 Tests.
+There are 39 tests at the moment.
 
-## Lizenz
+## License
 
-GPL-3.0-or-later – vollständiger Text in [LICENSE](LICENSE), Weitergabe ohne
-jede Gewährleistung. Es gibt keine Anmeldung: wer `bind: 0.0.0.0` setzt,
-entscheidet damit selbst, wer Modelle löschen darf.
+GPL-3.0-or-later – full text in [LICENSE](LICENSE), distributed without any
+warranty. There is no login: whoever sets `bind: 0.0.0.0` decides who may
+delete models.
