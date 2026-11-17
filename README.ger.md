@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="ollamaskope.jpg" alt="Ollamaskope V.1.0.0 " width="100%">
+</p>
+
 English: [README.md](README.md)
 
 # Ollamaskope – Modelliste eines Ollama-Endpunkts als Web-Werkzeug
