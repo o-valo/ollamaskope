@@ -177,6 +177,21 @@ Weights never travel between two hosts: Ollama offers no endpoint for blob
 downloads. Without file access (SSH/scp, a shared directory) a model built from
 a GGUF file cannot be moved at all.
 
+## Language and theme
+
+Two small switches sit in the top right:
+
+* **EN / DE** switches the interface between German and English. The choice is
+  kept in the browser (`localStorage`, key `ollamaskope-sprache`); without a
+  choice the browser language decides, with German as fallback.
+* **☀ / ☾** switches between the dark and the light theme (`localStorage`, key
+  `ollamaskope-thema`). Without a choice the system setting applies
+  (`prefers-color-scheme`).
+
+The texts live as keys in `static/app.js` (`TEXTE`); the HTML carries
+`data-i18n` attributes. A new text belongs in **both** tables – otherwise the
+English version shows the key itself.
+
 ## Configuration (`config.json`)
 
 ```json

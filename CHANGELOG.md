@@ -1,6 +1,6 @@
 # Änderungen
 
-## 0.1.0 – 17.11.2026
+## 1.00 – 17.11.2026
 
 Erste veröffentlichte Fassung.
 
@@ -16,6 +16,11 @@ Erste veröffentlichte Fassung.
   `ollamaskope.conf` (Vorrang, unbekannte Schlüssel sind ein Fehler mit
   Zeilennummer).
 - Rechte je Endpunkt: `schreiben: false` sperrt Erzeugen, Ausrollen und Löschen.
+- **Sprachumschalter** (EN / DE) oben rechts; alle Texte liegen als Schlüssel
+  in `static/app.js` (`TEXTE`), das HTML trägt `data-i18n`-Attribute.
+- **Helles und dunkles Design** mit Sonne/Mond-Schalter; ohne eigene Wahl gilt
+  die Systemeinstellung (`prefers-color-scheme`), beide Wahlen bleiben im
+  Browser.
 - Reines Python 3 (Standardbibliothek), keine Abhängigkeiten, kein venv.
 - Paketbau (`paket-bauen.sh`) und Ein-Zeilen-Installation aus dem eigenen Netz
   (`get.sh`).

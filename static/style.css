@@ -1,14 +1,73 @@
+/* Farben als Variablen: :root ist das dunkle Design, [data-theme="hell"] das
+   helle. Der Schalter oben rechts setzt data-theme am <html>. */
 :root {
+  color-scheme: dark;
   --grund: #14171c;
   --karte: #1b1f26;
   --rand: #2b313b;
+  --rand-stark: #3a4456;
   --text: #e7ebf2;
   --leise: #9aa4b4;
   --akzent: #6fa8dc;
   --akzent-stark: #8fc3f5;
   --gut: #63c98d;
+  --gut-rand: #2f5a41;
   --warnung: #e5b567;
   --gefahr: #e06c75;
+  --gefahr-rand: #5c3037;
+  --gefahr-rand-stark: #8b3a42;
+  --feld: #101318;
+  --knopf: #232936;
+  --knopf-hover: #2b3344;
+  --primaer: #2a4a6b;
+  --primaer-rand: #3a6189;
+  --primaer-hover: #345a80;
+  --gefahr-knopf: #6b2a30;
+  --gefahr-hover: #7d333b;
+  --gefahr-flaeche: #3a2226;
+  --zeile-hover: #20252e;
+  --linie: #232831;
+  --warn-flaeche: #2a2317;
+  --warn-rand: #4a3d22;
+  --warn-text: #e8d3a8;
+  --toast: #232a36;
+  --schatten: rgba(6, 8, 11, 0.7);
+  --schatten-toast: rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="hell"] {
+  color-scheme: light;
+  --grund: #f5f7fa;
+  --karte: #ffffff;
+  --rand: #d7dce3;
+  --rand-stark: #b9c2cd;
+  --text: #1b1f26;
+  --leise: #5c6675;
+  --akzent: #2f6f9f;
+  --akzent-stark: #1f5f8f;
+  --gut: #2c7a4d;
+  --gut-rand: #a8cfb8;
+  --warnung: #8a6512;
+  --gefahr: #b32d3a;
+  --gefahr-rand: #e0b6bb;
+  --gefahr-rand-stark: #c98f96;
+  --feld: #ffffff;
+  --knopf: #eef1f5;
+  --knopf-hover: #e2e7ee;
+  --primaer: #dbe8f5;
+  --primaer-rand: #a9c6e0;
+  --primaer-hover: #cddcf0;
+  --gefahr-knopf: #f7dcde;
+  --gefahr-hover: #f2cdd1;
+  --gefahr-flaeche: #fbeaec;
+  --zeile-hover: #f0f3f7;
+  --linie: #e6eaef;
+  --warn-flaeche: #fdf3dc;
+  --warn-rand: #e4cf9c;
+  --warn-text: #6b5314;
+  --toast: #ffffff;
+  --schatten: rgba(30, 38, 48, 0.35);
+  --schatten-toast: rgba(30, 38, 48, 0.18);
 }
 
 * { box-sizing: border-box; }
@@ -47,6 +106,7 @@ h1 {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .steuerung label {
@@ -54,8 +114,21 @@ h1 {
   font-size: 13px;
 }
 
+.umschalter {
+  display: flex;
+  gap: 6px;
+  margin-right: 4px;
+}
+
+.umschalter .knopf {
+  min-width: 40px;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
 select, input, textarea {
-  background: #101318;
+  background: var(--feld);
   color: var(--text);
   border: 1px solid var(--rand);
   border-radius: 8px;
@@ -128,13 +201,13 @@ main {
   border-radius: 999px;
 }
 
-.status.ok { color: var(--gut); border-color: #2f5a41; }
-.status.fehler { color: var(--gefahr); border-color: #5c3037; }
+.status.ok { color: var(--gut); border-color: var(--gut-rand); }
+.status.fehler { color: var(--gefahr); border-color: var(--gefahr-rand); }
 
 #filter { width: 160px; }
 
 .knopf {
-  background: #232936;
+  background: var(--knopf);
   color: var(--text);
   border: 1px solid var(--rand);
   border-radius: 8px;
@@ -144,15 +217,15 @@ main {
   cursor: pointer;
 }
 
-.knopf:hover:not(:disabled) { background: #2b3344; border-color: #3a4456; }
+.knopf:hover:not(:disabled) { background: var(--knopf-hover); border-color: var(--rand-stark); }
 .knopf:disabled { opacity: 0.45; cursor: not-allowed; }
 .knopf.klein { padding: 4px 9px; font-size: 12.5px; }
-.knopf.primaer { background: #2a4a6b; border-color: #3a6189; }
-.knopf.primaer:hover:not(:disabled) { background: #345a80; }
-.knopf.gefahr { background: #6b2a30; border-color: #8b3a42; }
-.knopf.gefahr:hover:not(:disabled) { background: #7d333b; }
-.knopf.gefahr-leise { color: var(--gefahr); border-color: #5c3037; }
-.knopf.gefahr-leise:hover:not(:disabled) { background: #3a2226; border-color: #8b3a42; }
+.knopf.primaer { background: var(--primaer); border-color: var(--primaer-rand); }
+.knopf.primaer:hover:not(:disabled) { background: var(--primaer-hover); }
+.knopf.gefahr { background: var(--gefahr-knopf); border-color: var(--gefahr-rand-stark); }
+.knopf.gefahr:hover:not(:disabled) { background: var(--gefahr-hover); }
+.knopf.gefahr-leise { color: var(--gefahr); border-color: var(--gefahr-rand); }
+.knopf.gefahr-leise:hover:not(:disabled) { background: var(--gefahr-flaeche); border-color: var(--gefahr-rand-stark); }
 
 .tabelle-rahmen { overflow-x: auto; }
 
@@ -187,12 +260,12 @@ th[data-richtung="ab"] .sort-knopf::after { content: " \25BC"; font-size: 9px; }
 
 td {
   padding: 8px 10px 8px 0;
-  border-bottom: 1px solid #232831;
+  border-bottom: 1px solid var(--linie);
   vertical-align: middle;
   white-space: nowrap;
 }
 
-tbody tr:hover { background: #20252e; }
+tbody tr:hover { background: var(--zeile-hover); }
 td.modell { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 
 .aktionen { text-align: left; }
@@ -207,13 +280,14 @@ details.karte > summary.karte-kopf {
 
 details.karte > summary.karte-kopf::-webkit-details-marker { display: none; }
 
+/* Der Text steht im Attribut, damit der Sprachumschalter ihn mitziehen kann. */
 details.karte > summary.karte-kopf::after {
-  content: "▸ ausklappen";
+  content: attr(data-hinweis);
   color: var(--leise);
   font-size: 12.5px;
 }
 
-details.karte[open] > summary.karte-kopf::after { content: "▾ einklappen"; }
+details.karte[open] > summary.karte-kopf::after { content: attr(data-hinweis-offen); }
 
 details.karte[open] > summary.karte-kopf { margin-bottom: 12px; }
 
@@ -313,7 +387,7 @@ label.ep-zeile {
   font-family: system-ui, sans-serif;
   font-size: 11px;
   color: var(--gut);
-  border: 1px solid #2f5a41;
+  border: 1px solid var(--gut-rand);
   border-radius: 999px;
   padding: 1px 7px;
 }
@@ -329,10 +403,10 @@ label.ep-zeile {
 .warnungen {
   margin: 10px 0 0;
   padding: 10px 12px 10px 28px;
-  background: #2a2317;
-  border: 1px solid #4a3d22;
+  background: var(--warn-flaeche);
+  border: 1px solid var(--warn-rand);
   border-radius: 8px;
-  color: #e8d3a8;
+  color: var(--warn-text);
   font-size: 12.5px;
 }
 
@@ -370,7 +444,7 @@ label.ep-zeile {
   padding: 10px 12px;
   max-height: 220px;
   overflow: auto;
-  background: #101318;
+  background: var(--feld);
   border: 1px solid var(--rand);
   border-radius: 8px;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -391,7 +465,7 @@ dialog {
   width: calc(100% - 40px);
 }
 
-dialog::backdrop { background: rgba(6, 8, 11, 0.7); }
+dialog::backdrop { background: var(--schatten); }
 
 dialog h2 { margin: 0 0 10px; font-size: 17px; }
 dialog p { color: var(--leise); font-size: 13.5px; }
@@ -422,14 +496,14 @@ dialog input { width: 100%; }
   left: 50%;
   bottom: 24px;
   transform: translateX(-50%);
-  background: #232a36;
+  background: var(--toast);
   border: 1px solid var(--rand);
   border-left: 3px solid var(--gut);
   border-radius: 8px;
   padding: 10px 16px;
   font-size: 13.5px;
   max-width: 90vw;
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 8px 26px var(--schatten-toast);
 }
 
 .toast.fehler { border-left-color: var(--gefahr); }

@@ -185,6 +185,21 @@ Gewichte wandern nie zwischen zwei Hosts: Ollama hat keinen Weg, Blobs
 auszuliefern. Ohne Dateizugriff (SSH/scp, geteiltes Verzeichnis) lässt sich ein
 aus einer GGUF-Datei gebautes Modell gar nicht bewegen.
 
+## Sprache und Design
+
+Oben rechts stehen zwei kleine Schalter:
+
+* **EN / DE** schaltet die Oberfläche zwischen Deutsch und Englisch um. Die
+  Wahl bleibt im Browser (`localStorage`, Schlüssel `ollamaskope-sprache`);
+  ohne Wahl entscheidet die Browsersprache, Deutsch ist der Rückfall.
+* **☀ / ☾** schaltet zwischen dunklem und hellem Design um (`localStorage`,
+  Schlüssel `ollamaskope-thema`). Ohne Wahl gilt die Systemeinstellung
+  (`prefers-color-scheme`).
+
+Die Texte stehen als Schlüssel in `static/app.js` (`TEXTE`), das HTML trägt
+`data-i18n`-Attribute. Ein neuer Text gehört in **beide** Tabellen – sonst
+zeigt die englische Fassung den Schlüssel selbst an.
+
 ## Konfiguration (`config.json`)
 
 ```json

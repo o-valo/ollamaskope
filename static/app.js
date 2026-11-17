@@ -1,5 +1,368 @@
 "use strict";
 
+// ---------------------------------------------------------------------------
+// Sprache und Design
+// ---------------------------------------------------------------------------
+// Deutsch ist die Quelle; jeder sichtbare Text steht unter einem Schlüssel.
+// Neue Texte also immer in beide Tabellen unten – und im HTML als data-i18n.
+const TEXTE = {
+  de: {
+    "kopf.unter": "Das Fernrohr für Ollama: Modelle ansehen, Modelfile bauen, laden, erzeugen und löschen.",
+    "kopf.endpunkt": "Endpunkt",
+    "kopf.endpunktNeu": "＋ Endpunkt",
+    "kopf.aktualisieren": "Aktualisieren",
+    "schalter.sprache": "Sprache umschalten: Deutsch / English",
+    "schalter.hell": "Helles Design einschalten",
+    "schalter.dunkel": "Dunkles Design einschalten",
+    "karte.ausklappen": "▸ ausklappen",
+    "karte.einklappen": "▾ einklappen",
+    "modelle.titel": "Modelle",
+    "modelle.aktionen": "Aktionen",
+    "modelle.filter": "filtern …",
+    "spalte.modell": "Modell",
+    "spalte.modellTitel": "Alphabetisch sortieren",
+    "spalte.groesse": "Größe",
+    "spalte.groesseTitel": "Nach Größe sortieren",
+    "spalte.familie": "Familie",
+    "spalte.familieTitel": "Nach Familie sortieren",
+    "spalte.parameter": "Parameter",
+    "spalte.parameterTitel": "Nach Parameterzahl sortieren",
+    "spalte.quant": "Quant",
+    "spalte.quantTitel": "Nach Quantisierung sortieren",
+    "spalte.geaendert": "geändert",
+    "spalte.geaendertTitel": "Nach Änderungsdatum sortieren",
+    "modelfile.titel": "Modelfile",
+    "modelfile.ausrollen": "⇄ Ausrollen",
+    "modelfile.loeschen": "🗑 Löschen",
+    "modelfile.kopieren": "Kopieren",
+    "modelfile.datei": "Als Datei",
+    "modelfile.hinweisLeer": "Bei einem Modell auf „Modelfile“ klicken, um es hier zu bearbeiten.",
+    "modelfile.platzhalter": 'FROM qwen3.5:9b\nPARAMETER num_ctx 32768\nSYSTEM """Du bist …"""',
+    "modelfile.neuerName": "Neuer Modellname",
+    "modelfile.namePlatzhalter": "mein-modell:latest",
+    "modelfile.erzeugen": "Modell erzeugen",
+    "modelfile.schreibHinweis": 'Dieser Endpunkt ist schreibgeschützt. Erzeugen und Löschen sind gesperrt – in <code>config.json</code> beim Endpunkt <code>"schreiben": true</code> setzen.',
+    "ep.titel": "Endpunkte",
+    "ep.hinweis": "Wird in config.json gespeichert und gilt sofort.",
+    "ep.neu": "Neuen Endpunkt eintragen",
+    "ep.name": "Name",
+    "ep.namePlatzhalter": "z. B. werkstatt",
+    "ep.url": "URL",
+    "ep.urlPlatzhalter": "http://10.0.0.50:11434",
+    "ep.schreiben": "Erzeugen und Löschen auf diesem Endpunkt erlauben",
+    "ep.schliessen": "Schließen",
+    "ep.eintragen": "Eintragen",
+    "ep.abbrechen": "Abbrechen",
+    "ep.wegTitel": "Endpunkt entfernen?",
+    "ep.wegText": "wird aus der Liste und aus config.json entfernt. Modelle auf dem Endpunkt bleiben unberührt.",
+    "ep.wegJa": "Ja, entfernen",
+    "ep.ausConf": "aus ollamaskope.conf",
+    "ep.entfernen": "Entfernen",
+    "ep.nurLesen": " · nur lesen",
+    "ep.hinweisConf": "Endpunkte aus ollamaskope.conf stehen fest – dort bearbeiten. Neue landen in config.json.",
+    "ep.nameUrlFehlt": "Name und URL angeben.",
+    "ep.eingetragen": "{0} eingetragen (Ollama {1}).",
+    "ep.entfernt": "Endpunkt entfernt.",
+    "abh.titel": "Abhängigkeiten",
+    "abh.status": "prüfe die Modelfiles …",
+    "abh.loeschen": "Dieses Modell löschen",
+    "abh.schliessen": "Schließen",
+    "abh.pruefe": "prüfe die Modelfiles aller Modelle …",
+    "abh.bautAuf": "baut auf",
+    "abh.darauf": "darauf bauen auf",
+    "abh.geschwister": "Geschwister (gleiche Basis)",
+    "abh.keinElternteil": "Kein Elternteil eingetragen.",
+    "abh.keinKind": "Kein anderes Modell baut darauf auf.",
+    "abh.keine": "Keine.",
+    "abh.ausDatei": 'Gebaut aus einer Datei: <code>{0}</code> – kein Modell auf diesem Endpunkt.',
+    "abh.ausRegistry": "Aus der Registry geladen – kein Elternteil eingetragen.",
+    "abh.geprueft": "{0} Modelle geprüft ({1})",
+    "abh.zwischen": "zwischengespeichert",
+    "abh.jetzt": "gerade eben",
+    "abh.ohneAntwort": " · {0} ohne Antwort",
+    "abh.nichtLadbar": "Nicht ladbar: {0}",
+    "abh.nichtDa": "nicht auf diesem Endpunkt",
+    "loeschen.titel": "Modell wirklich löschen?",
+    "loeschen.text1": "Das Modell",
+    "loeschen.text2": "wird mit seinen Dateien vom Endpunkt entfernt. Das lässt sich nicht rückgängig machen.",
+    "loeschen.abbrechen": "Abbrechen",
+    "loeschen.ja": "Ja, löschen",
+    "loeschen.ok": "{0} gelöscht.",
+    "ausroll.titel": "Modell ausrollen",
+    "ausroll.von": "von",
+    "ausroll.hinweis": "Übertragen wird das Rezept – Basis, Parameter, Template und Systemtext. Die Gewichte bleiben, wo sie sind: die Basis muss auf dem Ziel liegen.",
+    "ausroll.ziel": "Ziel-Endpunkt",
+    "ausroll.name": "Name auf dem Ziel",
+    "ausroll.basis": "Fehlende Basis dort ziehen (lädt sie aus der Registry, kann mehrere GB sein)",
+    "ausroll.datei": "GGUF-Pfad auf dem Ziel",
+    "ausroll.dateiOptional": "(nur GGUF-Modelle, optional)",
+    "ausroll.dateiPlatzhalter": "leer lassen, wenn die Datei dort gleich heißt",
+    "ausroll.abbrechen": "Abbrechen",
+    "ausroll.ja": "Ausrollen",
+    "ausroll.keinZiel": "Kein anderer Endpunkt mit Schreibrecht eingetragen.",
+    "ausroll.nameFehlt": "Bitte einen Namen für das Ziel angeben.",
+    "ausroll.laeuft": "Ausrollen: {0} von {1} nach {2} als {3} …",
+    "ausroll.ok": "{0} liegt jetzt auf {1}.",
+    "status.laedt": "lädt …",
+    "status.erreichbar": "erreichbar · Ollama {0} · {1} Modelle",
+    "status.fehler": "nicht erreichbar",
+    "liste.keinTreffer": "Kein Modell passt zum Filter.",
+    "liste.leer": "Dieser Endpunkt meldet keine Modelle.",
+    "aktion.laden": "Laden",
+    "aktion.entladen": "Entladen",
+    "aktion.ladenTitel": "In den Speicher laden (30 Minuten)",
+    "aktion.entladenTitel": "Aus dem Speicher nehmen",
+    "aktion.geladen": "geladen",
+    "aktion.abhTitel": "Abhängigkeiten anzeigen",
+    "schreib.hinweis": 'Nur lesen: dieser Endpunkt steht in config.json auf "schreiben": false – Erzeugen und Löschen sind gesperrt.',
+    "titel.loeschen": "Modell löschen",
+    "titel.gesperrt": "Endpunkt ist schreibgeschützt (config.json: schreiben=false)",
+    "titel.ausrollen": "Dieses Modell auf einem anderen Endpunkt nachbauen",
+    "titel.ausrollenKeinZiel": "Kein anderer Endpunkt mit Schreibrecht eingetragen",
+    "toast.laedt": "{0} wird geladen …",
+    "toast.entlaedt": "{0} wird entladen …",
+    "toast.geladen": "{0} ist geladen (30 Minuten).",
+    "toast.entladen": "{0} entladen.",
+    "mf.laedt": "lade Modelfile …",
+    "mf.hinweis": "Bearbeiten und mit neuem Namen erzeugen. FROM zeigt auf ein Modell, das auf dem Endpunkt liegt.",
+    "mf.fehler": "Modelfile nicht ladbar: {0}",
+    "erz.gesperrt": "Dieser Endpunkt ist schreibgeschützt.",
+    "erz.nameFehlt": "Bitte einen Modellnamen angeben.",
+    "erz.leer": "Das Modelfile ist leer.",
+    "erz.laeuft": "Erzeuge {0} auf {1} …",
+    "erz.fertig": "fertig",
+    "erz.ok": "Modell {0} erzeugt.",
+    "erz.ohneErfolg": "Ohne Erfolgsmeldung beendet – Log prüfen.",
+    "erz.fehler": "Fehler: {0}",
+    "erz.hinweis": "Hinweis: {0}",
+    "kopie.ok": "Modelfile kopiert.",
+    "kopie.fehler": "Kopieren nicht möglich – Text markieren und selbst kopieren.",
+    "start.fehler": "Endpunkte nicht ladbar: {0}",
+  },
+  en: {
+    "kopf.unter": "The telescope for Ollama: browse models, build a Modelfile, load, create and delete.",
+    "kopf.endpunkt": "Endpoint",
+    "kopf.endpunktNeu": "＋ Endpoint",
+    "kopf.aktualisieren": "Refresh",
+    "schalter.sprache": "Switch language: German / English",
+    "schalter.hell": "Switch to light theme",
+    "schalter.dunkel": "Switch to dark theme",
+    "karte.ausklappen": "▸ expand",
+    "karte.einklappen": "▾ collapse",
+    "modelle.titel": "Models",
+    "modelle.aktionen": "Actions",
+    "modelle.filter": "filter …",
+    "spalte.modell": "Model",
+    "spalte.modellTitel": "Sort alphabetically",
+    "spalte.groesse": "Size",
+    "spalte.groesseTitel": "Sort by size",
+    "spalte.familie": "Family",
+    "spalte.familieTitel": "Sort by family",
+    "spalte.parameter": "Parameters",
+    "spalte.parameterTitel": "Sort by parameter count",
+    "spalte.quant": "Quant",
+    "spalte.quantTitel": "Sort by quantisation",
+    "spalte.geaendert": "changed",
+    "spalte.geaendertTitel": "Sort by modification date",
+    "modelfile.titel": "Modelfile",
+    "modelfile.ausrollen": "⇄ Roll out",
+    "modelfile.loeschen": "🗑 Delete",
+    "modelfile.kopieren": "Copy",
+    "modelfile.datei": "Save as file",
+    "modelfile.hinweisLeer": "Click “Modelfile” on a model to edit it here.",
+    "modelfile.platzhalter": 'FROM qwen3.5:9b\nPARAMETER num_ctx 32768\nSYSTEM """You are …"""',
+    "modelfile.neuerName": "New model name",
+    "modelfile.namePlatzhalter": "my-model:latest",
+    "modelfile.erzeugen": "Create model",
+    "modelfile.schreibHinweis": 'This endpoint is read-only. Creating and deleting are locked – set <code>"schreiben": true</code> for the endpoint in <code>config.json</code>.',
+    "ep.titel": "Endpoints",
+    "ep.hinweis": "Stored in config.json and effective immediately.",
+    "ep.neu": "Add a new endpoint",
+    "ep.name": "Name",
+    "ep.namePlatzhalter": "e.g. workshop",
+    "ep.url": "URL",
+    "ep.urlPlatzhalter": "http://10.0.0.50:11434",
+    "ep.schreiben": "Allow creating and deleting on this endpoint",
+    "ep.schliessen": "Close",
+    "ep.eintragen": "Add",
+    "ep.abbrechen": "Cancel",
+    "ep.wegTitel": "Remove endpoint?",
+    "ep.wegText": "is removed from the list and from config.json. Models on the endpoint stay untouched.",
+    "ep.wegJa": "Yes, remove",
+    "ep.ausConf": "from ollamaskope.conf",
+    "ep.entfernen": "Remove",
+    "ep.nurLesen": " · read only",
+    "ep.hinweisConf": "Endpoints from ollamaskope.conf are fixed – edit them there. New ones go to config.json.",
+    "ep.nameUrlFehlt": "Please give a name and a URL.",
+    "ep.eingetragen": "{0} added (Ollama {1}).",
+    "ep.entfernt": "Endpoint removed.",
+    "abh.titel": "Dependencies",
+    "abh.status": "checking the Modelfiles …",
+    "abh.loeschen": "Delete this model",
+    "abh.schliessen": "Close",
+    "abh.pruefe": "checking the Modelfiles of all models …",
+    "abh.bautAuf": "built on",
+    "abh.darauf": "built upon by",
+    "abh.geschwister": "Siblings (same base)",
+    "abh.keinElternteil": "No parent recorded.",
+    "abh.keinKind": "No other model is built on it.",
+    "abh.keine": "None.",
+    "abh.ausDatei": 'Built from a file: <code>{0}</code> – no model on this endpoint.',
+    "abh.ausRegistry": "Pulled from the registry – no parent recorded.",
+    "abh.geprueft": "{0} models checked ({1})",
+    "abh.zwischen": "cached",
+    "abh.jetzt": "just now",
+    "abh.ohneAntwort": " · {0} without answer",
+    "abh.nichtLadbar": "Cannot load: {0}",
+    "abh.nichtDa": "not on this endpoint",
+    "loeschen.titel": "Really delete this model?",
+    "loeschen.text1": "The model",
+    "loeschen.text2": "is removed from the endpoint together with its files. This cannot be undone.",
+    "loeschen.abbrechen": "Cancel",
+    "loeschen.ja": "Yes, delete",
+    "loeschen.ok": "{0} deleted.",
+    "ausroll.titel": "Roll out model",
+    "ausroll.von": "from",
+    "ausroll.hinweis": "Only the recipe is transferred – base, parameters, template and system text. The weights stay where they are: the base must exist on the target.",
+    "ausroll.ziel": "Target endpoint",
+    "ausroll.name": "Name on the target",
+    "ausroll.basis": "Pull the missing base there (downloads it from the registry, may be several GB)",
+    "ausroll.datei": "GGUF path on the target",
+    "ausroll.dateiOptional": "(GGUF models only, optional)",
+    "ausroll.dateiPlatzhalter": "leave empty if the file has the same name there",
+    "ausroll.abbrechen": "Cancel",
+    "ausroll.ja": "Roll out",
+    "ausroll.keinZiel": "No other endpoint with write access configured.",
+    "ausroll.nameFehlt": "Please give a name for the target.",
+    "ausroll.laeuft": "Rolling out: {0} from {1} to {2} as {3} …",
+    "ausroll.ok": "{0} is now on {1}.",
+    "status.laedt": "loading …",
+    "status.erreichbar": "reachable · Ollama {0} · {1} models",
+    "status.fehler": "not reachable",
+    "liste.keinTreffer": "No model matches the filter.",
+    "liste.leer": "This endpoint reports no models.",
+    "aktion.laden": "Load",
+    "aktion.entladen": "Unload",
+    "aktion.ladenTitel": "Load into memory (30 minutes)",
+    "aktion.entladenTitel": "Remove from memory",
+    "aktion.geladen": "loaded",
+    "aktion.abhTitel": "Show dependencies",
+    "schreib.hinweis": 'Read only: this endpoint is set to "schreiben": false in config.json – creating and deleting are locked.',
+    "titel.loeschen": "Delete model",
+    "titel.gesperrt": "Endpoint is read-only (config.json: schreiben=false)",
+    "titel.ausrollen": "Rebuild this model on another endpoint",
+    "titel.ausrollenKeinZiel": "No other endpoint with write access configured",
+    "toast.laedt": "{0} is loading …",
+    "toast.entlaedt": "{0} is unloading …",
+    "toast.geladen": "{0} is loaded (30 minutes).",
+    "toast.entladen": "{0} unloaded.",
+    "mf.laedt": "loading Modelfile …",
+    "mf.hinweis": "Edit it and create a new model from it. FROM points to a model that exists on the endpoint.",
+    "mf.fehler": "Cannot load Modelfile: {0}",
+    "erz.gesperrt": "This endpoint is read-only.",
+    "erz.nameFehlt": "Please give a model name.",
+    "erz.leer": "The Modelfile is empty.",
+    "erz.laeuft": "Creating {0} on {1} …",
+    "erz.fertig": "done",
+    "erz.ok": "Model {0} created.",
+    "erz.ohneErfolg": "Finished without a success message – check the log.",
+    "erz.fehler": "Error: {0}",
+    "erz.hinweis": "Note: {0}",
+    "kopie.ok": "Modelfile copied.",
+    "kopie.fehler": "Copying failed – select the text and copy it yourself.",
+    "start.fehler": "Cannot load endpoints: {0}",
+  },
+};
+
+let sprache = "de";
+
+function t(schluessel, ...werte) {
+  const tabelle = TEXTE[sprache] || TEXTE.de;
+  const text = tabelle[schluessel] ?? TEXTE.de[schluessel] ?? schluessel;
+  if (!werte.length) return text;
+  return text.replace(/\{(\d+)\}/g, (treffer, nummer) => werte[nummer] ?? treffer);
+}
+
+function spracheLaden() {
+  const gespeichert = localStorage.getItem("ollamaskope-sprache");
+  if (gespeichert === "de" || gespeichert === "en") {
+    sprache = gespeichert;
+    return;
+  }
+  sprache = (navigator.language || "de").toLowerCase().startsWith("de") ? "de" : "en";
+}
+
+function spracheAnwenden() {
+  document.documentElement.lang = sprache;
+  for (const knoten of document.querySelectorAll("[data-i18n]")) {
+    knoten.textContent = t(knoten.dataset.i18n);
+  }
+  for (const knoten of document.querySelectorAll("[data-i18n-html]")) {
+    knoten.innerHTML = t(knoten.dataset.i18nHtml);
+  }
+  for (const knoten of document.querySelectorAll("[data-i18n-placeholder]")) {
+    knoten.setAttribute("placeholder", t(knoten.dataset.i18nPlaceholder));
+  }
+  for (const knoten of document.querySelectorAll("[data-i18n-title]")) {
+    if (knoten.id !== "thema") knoten.setAttribute("title", t(knoten.dataset.i18nTitle));
+  }
+  for (const knoten of document.querySelectorAll("details.karte > summary")) {
+    knoten.dataset.hinweis = t("karte.ausklappen");
+    knoten.dataset.hinweisOffen = t("karte.einklappen");
+  }
+  const sprachKnopf = $("sprache");
+  if (sprachKnopf) {
+    sprachKnopf.textContent = sprache === "de" ? "EN" : "DE";
+    sprachKnopf.title = t("schalter.sprache");
+    sprachKnopf.setAttribute("aria-label", sprachKnopf.title);
+  }
+  themaAnwenden();
+  $("modelfile-hinweis").textContent = zustand.modelfileModell
+    ? t("mf.hinweis")
+    : t("modelfile.hinweisLeer");
+  if (zustand.endpunkte.length) {
+    zeichnen();
+    schreibrechteAnwenden();
+  }
+  const dialog = $("endpunkt-dialog");
+  if (dialog && dialog.open) epListeZeichnen();
+}
+
+function spracheUmschalten() {
+  sprache = sprache === "de" ? "en" : "de";
+  localStorage.setItem("ollamaskope-sprache", sprache);
+  spracheAnwenden();
+}
+
+function themaLaden() {
+  const gespeichert = localStorage.getItem("ollamaskope-thema");
+  let thema = gespeichert;
+  if (thema !== "hell" && thema !== "dunkel") {
+    const hell =
+      window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+    thema = hell ? "hell" : "dunkel";
+  }
+  document.documentElement.dataset.theme = thema;
+  themaAnwenden();
+}
+
+function themaAnwenden() {
+  const dunkel = document.documentElement.dataset.theme !== "hell";
+  const knopf = $("thema");
+  if (!knopf) return;
+  knopf.textContent = dunkel ? "☀" : "☾";
+  knopf.title = t(dunkel ? "schalter.hell" : "schalter.dunkel");
+  knopf.setAttribute("aria-label", knopf.title);
+}
+
+function themaUmschalten() {
+  const warHell = document.documentElement.dataset.theme === "hell";
+  const thema = warHell ? "dunkel" : "hell";
+  document.documentElement.dataset.theme = thema;
+  localStorage.setItem("ollamaskope-thema", thema);
+  themaAnwenden();
+}
+
 const $ = (id) => document.getElementById(id);
 
 const zustand = {
@@ -37,7 +400,8 @@ function datum(iso) {
   if (!iso) return "–";
   const zeit = new Date(iso);
   if (Number.isNaN(zeit.getTime())) return "–";
-  return zeit.toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
+  const ort = sprache === "de" ? "de-DE" : "en-US";
+  return zeit.toLocaleString(ort, { dateStyle: "short", timeStyle: "short" });
 }
 
 let toastZeit = null;
@@ -89,7 +453,7 @@ async function endpunkteLaden(bevorzugt = null) {
   for (const ep of zustand.endpunkte) {
     const option = document.createElement("option");
     option.value = ep.id;
-    option.textContent = ep.name + (ep.schreiben ? "" : " · nur lesen");
+    option.textContent = ep.name + (ep.schreiben ? "" : t("ep.nurLesen"));
     auswahl.append(option);
   }
   const gemerkt = bevorzugt || localStorage.getItem("ollamaskope-endpunkt");
@@ -111,21 +475,19 @@ function epListeZeichnen() {
     punkt.className = "ep-eintrag";
     punkt.innerHTML = `
       <span><code>${esc(ep.name)}</code><span class="abh-meta">${esc(ep.url)}</span>${
-        ausConf ? '<span class="abh-meta">aus ollamaskope.conf</span>' : ""
+        ausConf ? `<span class="abh-meta">${esc(t("ep.ausConf"))}</span>` : ""
       }</span>
       ${
         ausConf
           ? ""
           : `<button class="knopf klein gefahr-leise" type="button"
-        data-ep-weg="${esc(ep.id)}" data-ep-name="${esc(ep.name)}">Entfernen</button>`
+        data-ep-weg="${esc(ep.id)}" data-ep-name="${esc(ep.name)}">${esc(t("ep.entfernen"))}</button>`
       }`;
     liste.append(punkt);
   }
   const hinweis = $("ep-hinweis");
   if (hinweis) {
-    hinweis.textContent = ausDatei
-      ? "Endpunkte aus ollamaskope.conf stehen fest – dort bearbeiten. Neue landen in config.json."
-      : "Wird in config.json gespeichert und gilt sofort.";
+    hinweis.textContent = ausDatei ? t("ep.hinweisConf") : t("ep.hinweis");
   }
 }
 
@@ -146,7 +508,7 @@ async function endpunktHinzufuegen() {
   const fehler = $("ep-fehler");
   fehler.hidden = true;
   if (!name || !url) {
-    fehler.textContent = "Name und URL angeben.";
+    fehler.textContent = t("ep.nameUrlFehlt");
     fehler.hidden = false;
     return;
   }
@@ -157,7 +519,7 @@ async function endpunktHinzufuegen() {
       body: JSON.stringify({ name, url, schreiben }),
     });
     $("endpunkt-dialog").close();
-    toast(`${daten.endpunkt.name} eingetragen (Ollama ${daten.version || "?"}).`);
+    toast(t("ep.eingetragen", daten.endpunkt.name, daten.version || "?"));
     await endpunkteLaden(daten.endpunkt.id);
     await modelleLaden();
   } catch (ausnahme) {
@@ -186,7 +548,7 @@ async function endpunktEntfernen() {
     });
     $("ep-weg-dialog").close();
     $("endpunkt-dialog").close();
-    toast("Endpunkt entfernt.");
+    toast(t("ep.entfernt"));
     await endpunkteLaden();
     await modelleLaden();
   } catch (ausnahme) {
@@ -202,21 +564,20 @@ async function modelleLaden() {
   const ep = aktuellerEndpunkt();
   if (!ep) return;
   const status = $("endpunkt-status");
-  status.textContent = "lädt …";
+  status.textContent = t("status.laedt");
   status.className = "status";
 
   try {
     const daten = await anfrage(`/api/modelle?endpunkt=${encodeURIComponent(ep.id)}`);
     zustand.modelle = daten.modelle || [];
     zustand.geladen = new Set((daten.geladen || []).map((eintrag) => eintrag.name));
-    status.textContent =
-      `erreichbar · Ollama ${daten.version || "?"} · ${zustand.modelle.length} Modelle`;
+    status.textContent = t("status.erreichbar", daten.version || "?", zustand.modelle.length);
     status.className = "status ok";
     $("liste-fehler").hidden = true;
   } catch (fehler) {
     zustand.modelle = [];
     zustand.geladen = new Set();
-    status.textContent = "nicht erreichbar";
+    status.textContent = t("status.fehler");
     status.className = "status fehler";
     $("liste-fehler").textContent = String(fehler.message || fehler);
     $("liste-fehler").hidden = false;
@@ -256,7 +617,7 @@ function sortieren(liste) {
     const links = sortWert(a, feld);
     const rechts = sortWert(b, feld);
     if (istText) {
-      return faktor * String(links).localeCompare(String(rechts), "de", {
+      return faktor * String(links).localeCompare(String(rechts), sprache, {
         numeric: true,
         sensitivity: "base",
       });
@@ -301,14 +662,16 @@ function zeichnen() {
       <td class="aktionen">
         <button class="knopf klein" type="button" data-aktion="${istGeladen ? "entladen" : "laden"}"
           data-modell="${esc(modell.name)}"
-          title="${istGeladen ? "Aus dem Speicher nehmen" : "In den Speicher laden (30 Minuten)"}">${istGeladen ? "Entladen" : "Laden"}</button>
+          title="${esc(t(istGeladen ? "aktion.entladenTitel" : "aktion.ladenTitel"))}">${esc(t(istGeladen ? "aktion.entladen" : "aktion.laden"))}</button>
         <button class="knopf klein" type="button" data-aktion="modelfile"
           data-modell="${esc(modell.name)}">Modelfile</button>
       </td>
       <td class="modell"><button class="modell-knopf" type="button"
         data-aktion="abhaengigkeiten" data-modell="${esc(modell.name)}"
-        title="Abhängigkeiten anzeigen">${esc(modell.name)}</button>${
-        zustand.geladen.has(modell.name) ? '<span class="chip">geladen</span>' : ""
+        title="${esc(t("aktion.abhTitel"))}">${esc(modell.name)}</button>${
+        zustand.geladen.has(modell.name)
+          ? `<span class="chip">${esc(t("aktion.geladen"))}</span>`
+          : ""
       }</td>
       <td>${groesse(modell.size)}</td>
       <td>${esc(details.family || "–")}</td>
@@ -323,8 +686,8 @@ function zeichnen() {
     : "";
   $("leer").hidden = sichtbar.length > 0;
   $("leer").textContent = zustand.modelle.length
-    ? "Kein Modell passt zum Filter."
-    : "Dieser Endpunkt meldet keine Modelle.";
+    ? t("liste.keinTreffer")
+    : t("liste.leer");
   $("modelfile-name").textContent = zustand.modelfileModell || "";
 }
 
@@ -334,27 +697,21 @@ function schreibrechteAnwenden() {
   $("schreib-hinweis").hidden = darf;
   const hinweis = $("liste-hinweis");
   hinweis.hidden = darf;
-  hinweis.textContent = darf
-    ? ""
-    : "Nur lesen: dieser Endpunkt steht in config.json auf \"schreiben\": false – Erzeugen und Löschen sind gesperrt.";
+  hinweis.textContent = darf ? "" : t("schreib.hinweis");
   const editorKnopf = $("modell-loeschen");
   editorKnopf.hidden = !zustand.modelfileModell;
   editorKnopf.disabled = !darf;
-  editorKnopf.title = darf
-    ? "Modell löschen"
-    : "Endpunkt ist schreibgeschützt (config.json: schreiben=false)";
+  editorKnopf.title = darf ? t("titel.loeschen") : t("titel.gesperrt");
   const ausrollKnopf = $("modell-ausrollen");
   const anderesZiel = zustand.endpunkte.some(
     (ep) => ep.id !== zustand.endpunkt && ep.schreiben,
   );
   ausrollKnopf.hidden = !zustand.modelfileModell;
   ausrollKnopf.disabled = !anderesZiel;
-  ausrollKnopf.title = anderesZiel
-    ? "Dieses Modell auf einem anderen Endpunkt nachbauen"
-    : "Kein anderer Endpunkt mit Schreibrecht eingetragen";
+  ausrollKnopf.title = anderesZiel ? t("titel.ausrollen") : t("titel.ausrollenKeinZiel");
   const abhKnopf = $("abh-loeschen");
   abhKnopf.disabled = !darf;
-  abhKnopf.title = darf ? "" : "Endpunkt ist schreibgeschützt (config.json: schreiben=false)";
+  abhKnopf.title = darf ? "" : t("titel.gesperrt");
 }
 
 function vorschlagName(modell) {
@@ -366,13 +723,13 @@ function vorschlagName(modell) {
 async function modellLadenOderEntladen(modell, laden) {
   const ep = aktuellerEndpunkt();
   if (!ep) return;
-  toast(laden ? `${modell} wird geladen …` : `${modell} wird entladen …`);
+  toast(t(laden ? "toast.laedt" : "toast.entlaedt", modell));
   try {
     await anfrage(laden ? "/api/laden" : "/api/entladen", {
       method: "POST",
       body: JSON.stringify({ endpunkt: ep.id, modell }),
     });
-    toast(laden ? `${modell} ist geladen (30 Minuten).` : `${modell} entladen.`);
+    toast(t(laden ? "toast.geladen" : "toast.entladen", modell));
     await modelleLaden();
   } catch (fehler) {
     toast(String(fehler.message || fehler), "fehler");
@@ -382,7 +739,7 @@ async function modellLadenOderEntladen(modell, laden) {
 async function modelfileLaden(modell) {
   const ep = aktuellerEndpunkt();
   if (!ep) return;
-  $("modelfile-hinweis").textContent = "lade Modelfile …";
+  $("modelfile-hinweis").textContent = t("mf.laedt");
   try {
     const daten = await anfrage("/api/modelfile", {
       method: "POST",
@@ -393,8 +750,7 @@ async function modelfileLaden(modell) {
     $("modelfile-karte").open = true;
     $("modelfile").value = daten.modelfile || "";
     $("modelfile-name").textContent = modell;
-    $("modelfile-hinweis").textContent =
-      "Bearbeiten und mit neuem Namen erzeugen. FROM zeigt auf ein Modell, das auf dem Endpunkt liegt.";
+    $("modelfile-hinweis").textContent = t("mf.hinweis");
     $("neuer-name").value = vorschlagName(modell);
 
     const warnungen = $("warnungen");
@@ -406,8 +762,7 @@ async function modelfileLaden(modell) {
     }
     warnungen.hidden = (daten.warnungen || []).length === 0;
   } catch (fehler) {
-    $("modelfile-hinweis").textContent =
-      `Modelfile nicht ladbar: ${fehler.message || fehler}`;
+    $("modelfile-hinweis").textContent = t("mf.fehler", fehler.message || fehler);
   }
 }
 
@@ -439,25 +794,25 @@ async function erzeugen() {
   const ep = aktuellerEndpunkt();
   if (!ep) return;
   if (!schreibbar()) {
-    toast("Dieser Endpunkt ist schreibgeschützt.", "fehler");
+    toast(t("erz.gesperrt"), "fehler");
     return;
   }
   const name = $("neuer-name").value.trim();
   const modelfile = $("modelfile").value;
   if (!name) {
-    toast("Bitte einen Modellnamen angeben.", "fehler");
+    toast(t("erz.nameFehlt"), "fehler");
     $("neuer-name").focus();
     return;
   }
   if (!modelfile.trim()) {
-    toast("Das Modelfile ist leer.", "fehler");
+    toast(t("erz.leer"), "fehler");
     return;
   }
 
   const log = $("log");
   log.hidden = false;
   log.textContent = "";
-  logZeile(`Erzeuge ${name} auf ${ep.name} …`);
+  logZeile(t("erz.laeuft", name, ep.name));
   $("erzeugen").disabled = true;
 
   try {
@@ -487,12 +842,12 @@ async function erzeugen() {
       }
       if (meldung.error) {
         fehlerText = meldung.error;
-        logZeile(`Fehler: ${meldung.error}`, true);
+        logZeile(t("erz.fehler", meldung.error), true);
       } else if (meldung.hinweis) {
-        logZeile(`Hinweis: ${meldung.hinweis}`);
+        logZeile(t("erz.hinweis", meldung.hinweis));
       } else if (meldung.status === "success") {
         erfolg = true;
-        logZeile("fertig");
+        logZeile(t("erz.fertig"));
       } else if (meldung.status) {
         logZeile(meldung.status);
       }
@@ -501,13 +856,13 @@ async function erzeugen() {
     await stromZeilen(antwort, verarbeiten);
 
     if (erfolg && !fehlerText) {
-      toast(`Modell ${name} erzeugt.`);
+      toast(t("erz.ok", name));
       await modelleLaden();
     } else {
-      toast(fehlerText || "Ohne Erfolgsmeldung beendet – Log prüfen.", "fehler");
+      toast(fehlerText || t("erz.ohneErfolg"), "fehler");
     }
   } catch (fehler) {
-    logZeile(`Fehler: ${fehler.message || fehler}`, true);
+    logZeile(t("erz.fehler", fehler.message || fehler), true);
     toast(String(fehler.message || fehler), "fehler");
   } finally {
     $("erzeugen").disabled = !schreibbar();
@@ -521,7 +876,7 @@ function abhZeile(eintrag) {
     ? `<span class="abh-meta">${esc(teile.join(" · "))}</span>`
     : "";
   if (!eintrag.vorhanden) {
-    return `<li><code>${esc(eintrag.modell)}</code><span class="abh-meta">nicht auf diesem Endpunkt</span></li>`;
+    return `<li><code>${esc(eintrag.modell)}</code><span class="abh-meta">${esc(t("abh.nichtDa"))}</span></li>`;
   }
   return `<li><button class="abh-link" type="button" data-waehlen="${esc(eintrag.modell)}">
     <code>${esc(eintrag.modell)}</code></button>${zusatz}</li>`;
@@ -540,7 +895,7 @@ async function abhaengigkeitenZeigen(modell) {
   zustand.abhModell = modell;
   $("abh-modell").textContent = modell;
   $("abh-status").hidden = false;
-  $("abh-status").textContent = "prüfe die Modelfiles aller Modelle …";
+  $("abh-status").textContent = t("abh.pruefe");
   $("abh-inhalt").innerHTML = "";
   const dialog = $("abh-dialog");
   if (!dialog.open) dialog.showModal();
@@ -551,31 +906,31 @@ async function abhaengigkeitenZeigen(modell) {
     );
     let basis;
     if (daten.basis === "datei") {
-      basis = `<section class="abh-gruppe"><h3>baut auf</h3><p class="abh-leer">Gebaut aus einer Datei: <code>${esc(daten.basis_roh)}</code> – kein Modell auf diesem Endpunkt.</p></section>`;
+      basis = `<section class="abh-gruppe"><h3>${esc(t("abh.bautAuf"))}</h3><p class="abh-leer">${t("abh.ausDatei", esc(daten.basis_roh))}</p></section>`;
     } else if (daten.basis === "registry") {
-      basis = `<section class="abh-gruppe"><h3>baut auf</h3><p class="abh-leer">Aus der Registry geladen – kein Elternteil eingetragen.</p></section>`;
+      basis = `<section class="abh-gruppe"><h3>${esc(t("abh.bautAuf"))}</h3><p class="abh-leer">${esc(t("abh.ausRegistry"))}</p></section>`;
     } else {
-      basis = abhGruppe("baut auf", daten.baut_auf, "Kein Elternteil eingetragen.");
+      basis = abhGruppe(t("abh.bautAuf"), daten.baut_auf, t("abh.keinElternteil"));
     }
     $("abh-inhalt").innerHTML =
       basis +
-      abhGruppe("darauf bauen auf", daten.darauf_bauen, "Kein anderes Modell baut darauf auf.") +
-      abhGruppe("Geschwister (gleiche Basis)", daten.geschwister, "Keine.");
+      abhGruppe(t("abh.darauf"), daten.darauf_bauen, t("abh.keinKind")) +
+      abhGruppe(t("abh.geschwister"), daten.geschwister, t("abh.keine"));
     zustand.abhModell = daten.modell || modell;
     schreibrechteAnwenden();
     const fehler = (daten.fehler || []).length;
     $("abh-status").textContent =
-      `${daten.geprueft} Modelle geprüft (${daten.aus_speicher ? "zwischengespeichert" : "gerade eben"})` +
-      (fehler ? ` · ${fehler} ohne Antwort` : "");
+      t("abh.geprueft", daten.geprueft, daten.aus_speicher ? t("abh.zwischen") : t("abh.jetzt")) +
+      (fehler ? t("abh.ohneAntwort", fehler) : "");
   } catch (fehler) {
-    $("abh-status").textContent = `Nicht ladbar: ${fehler.message || fehler}`;
+    $("abh-status").textContent = t("abh.nichtLadbar", fehler.message || fehler);
   }
 }
 
 function loeschenOeffnen(modell) {
   if (!modell) return;
   if (!schreibbar()) {
-    toast("Dieser Endpunkt ist schreibgeschützt.", "fehler");
+    toast(t("erz.gesperrt"), "fehler");
     return;
   }
   zustand.loeschModell = modell;
@@ -601,7 +956,7 @@ async function loeschen() {
       }),
     });
     $("loeschen-dialog").close();
-    toast(`${modell} gelöscht.`);
+    toast(t("loeschen.ok", modell));
     if (zustand.modelfileModell === modell) {
       zustand.modelfileModell = null;
       $("modelfile").value = "";
@@ -622,7 +977,7 @@ function ausrollOeffnen() {
   if (!ep || !modell) return;
   const ziele = zustand.endpunkte.filter((eintrag) => eintrag.id !== ep.id);
   if (!ziele.some((eintrag) => eintrag.schreiben)) {
-    toast("Kein anderer Endpunkt mit Schreibrecht eingetragen.", "fehler");
+    toast(t("ausroll.keinZiel"), "fehler");
     return;
   }
   zustand.ausrollModell = modell;
@@ -639,7 +994,9 @@ function ausrollOeffnen() {
     const option = document.createElement("option");
     option.value = eintrag.id;
     option.dataset.name = eintrag.name;
-    option.textContent = eintrag.schreiben ? eintrag.name : `${eintrag.name} (nur lesen)`;
+    option.textContent = eintrag.schreiben
+      ? eintrag.name
+      : `${eintrag.name}${t("ep.nurLesen")}`;
     option.disabled = !eintrag.schreiben;
     auswahl.append(option);
   }
@@ -656,7 +1013,7 @@ async function ausrollen() {
   const name = $("ausroll-name").value.trim();
   if (!ep || !modell || !ziel) return;
   if (!name) {
-    toast("Bitte einen Namen für das Ziel angeben.", "fehler");
+    toast(t("ausroll.nameFehlt"), "fehler");
     $("ausroll-name").focus();
     return;
   }
@@ -665,7 +1022,7 @@ async function ausrollen() {
   const log = $("log");
   log.hidden = false;
   log.textContent = "";
-  logZeile(`Ausrollen: ${modell} von ${ep.name} nach ${zielName} als ${name} …`);
+  logZeile(t("ausroll.laeuft", modell, ep.name, zielName, name));
   $("modell-ausrollen").disabled = true;
 
   try {
@@ -701,24 +1058,24 @@ async function ausrollen() {
       }
       if (meldung.error) {
         fehlerText = meldung.error;
-        logZeile(`Fehler: ${meldung.error}`, true);
+        logZeile(t("erz.fehler", meldung.error), true);
       } else if (meldung.hinweis) {
-        logZeile(`Hinweis: ${meldung.hinweis}`);
+        logZeile(t("erz.hinweis", meldung.hinweis));
       } else if (meldung.status === "success") {
         erfolg = true;
-        logZeile("fertig");
+        logZeile(t("erz.fertig"));
       } else if (meldung.status) {
         logZeile(meldung.status);
       }
     });
 
     if (erfolg && !fehlerText) {
-      toast(`${name} liegt jetzt auf ${zielName}.`);
+      toast(t("ausroll.ok", name, zielName));
     } else {
-      toast(fehlerText || "Ohne Erfolgsmeldung beendet – Log prüfen.", "fehler");
+      toast(fehlerText || t("erz.ohneErfolg"), "fehler");
     }
   } catch (fehler) {
-    logZeile(`Fehler: ${fehler.message || fehler}`, true);
+    logZeile(t("erz.fehler", fehler.message || fehler), true);
     toast(String(fehler.message || fehler), "fehler");
   } finally {
     schreibrechteAnwenden();
@@ -726,10 +1083,16 @@ async function ausrollen() {
 }
 
 async function start() {
+  themaLaden();
+  spracheLaden();
+  spracheAnwenden();
+  $("sprache").addEventListener("click", spracheUmschalten);
+  $("thema").addEventListener("click", themaUmschalten);
+
   try {
     await endpunkteLaden();
   } catch (fehler) {
-    toast(`Endpunkte nicht ladbar: ${fehler.message || fehler}`, "fehler");
+    toast(t("start.fehler", fehler.message || fehler), "fehler");
     return;
   }
 
@@ -793,9 +1156,9 @@ async function start() {
     if (!text.trim()) return;
     try {
       await navigator.clipboard.writeText(text);
-      toast("Modelfile kopiert.");
+      toast(t("kopie.ok"));
     } catch {
-      toast("Kopieren nicht möglich – Text markieren und selbst kopieren.", "fehler");
+      toast(t("kopie.fehler"), "fehler");
     }
   });
   $("herunterladen").addEventListener("click", () => {

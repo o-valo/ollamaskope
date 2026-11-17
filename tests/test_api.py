@@ -894,6 +894,21 @@ class WerkzeugTest(unittest.TestCase):
         self.assertEqual(code, 400)
         self.assertIn("Unbekannter Endpunkt", json.loads(text)["fehler"])
 
+    # -- Oberfläche ----------------------------------------------------
+
+    def test_oberflaeche_hat_sprach_und_themschalter(self) -> None:
+        code, text = self.ruf("/")
+        self.assertEqual(code, 200)
+        self.assertIn('id="sprache"', text)
+        self.assertIn('id="thema"', text)
+        self.assertIn("data-i18n", text)
+        code, js = self.ruf("/app.js")
+        self.assertEqual(code, 200)
+        self.assertIn("const TEXTE = {", js)
+        self.assertIn("function spracheUmschalten", js)
+        self.assertIn("function themaUmschalten", js)
+        self.assertIn('"ollamaskope-thema"', js)
+
     # -- Schutz --------------------------------------------------------
 
     def test_schreibende_wege_ohne_kopf_gesperrt(self) -> None:
