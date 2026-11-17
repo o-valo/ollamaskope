@@ -9,7 +9,7 @@ English: [README.md](README.md)
 Zeigt die Modelle eines entfernten (oder lokalen) Ollama-Endpunkts, baut aus
 jedem Modell ein portables Modelfile, erzeugt daraus ein neues Modell und
 löscht Modelle. Reines Python 3 (Standardbibliothek), kein Flask, keine
-Node-Abhängigkeiten – dasselbe Muster wie `~/wg-watcher/wg-http.py`.
+Node-Abhängigkeiten `.
 
 Das Werkzeug rechnet nicht und läuft deshalb nicht auf einem Inferenz-Host. Es spricht nur die Ollama-API über HTTP.
 
