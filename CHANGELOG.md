@@ -22,6 +22,7 @@ Erste veröffentlichte Fassung.
   die Systemeinstellung (`prefers-color-scheme`), beide Wahlen bleiben im
   Browser.
 - Reines Python 3 (Standardbibliothek), keine Abhängigkeiten, kein venv.
+- Lizenz **AGPL-3.0-or-later** – `LICENSE` enthält den vollständigen Text.
 - Paketbau (`paket-bauen.sh`) und Ein-Zeilen-Installation aus dem eigenen Netz
   (`get.sh`).
 

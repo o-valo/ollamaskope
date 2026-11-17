@@ -1,19 +1,13 @@
-# Ollamaskope – Modelliste eines Ollama-Endpunkts als Web-Werkzeug
+English: [README.md](README.md)
 
-> Bis 17.11.2026 hieß das Werkzeug `ollama-sort`. Verzeichnis, Programm und
-> Kurzbefehl heißen jetzt `ollamaskope`; die alten Konfigurationsdateien
-> `ollama-sort.conf` / `ollama-sort.env` und die alten Umgebungsvariablen
-> `OLLAMA_SORT_*` gelten weiter.
+# Ollamaskope – Modelliste eines Ollama-Endpunkts als Web-Werkzeug
 
 Zeigt die Modelle eines entfernten (oder lokalen) Ollama-Endpunkts, baut aus
 jedem Modell ein portables Modelfile, erzeugt daraus ein neues Modell und
 löscht Modelle. Reines Python 3 (Standardbibliothek), kein Flask, keine
 Node-Abhängigkeiten – dasselbe Muster wie `~/wg-watcher/wg-http.py`.
 
-Das Werkzeug rechnet nicht und läuft deshalb nicht auf einem Inferenz-Host
-(§5b der Wissensdatei). Es spricht nur die Ollama-API über HTTP.
-
-English: [README.md](README.md)
+Das Werkzeug rechnet nicht und läuft deshalb nicht auf einem Inferenz-Host. Es spricht nur die Ollama-API über HTTP.
 
 ## Installation
 
@@ -185,21 +179,6 @@ Gewichte wandern nie zwischen zwei Hosts: Ollama hat keinen Weg, Blobs
 auszuliefern. Ohne Dateizugriff (SSH/scp, geteiltes Verzeichnis) lässt sich ein
 aus einer GGUF-Datei gebautes Modell gar nicht bewegen.
 
-## Sprache und Design
-
-Oben rechts stehen zwei kleine Schalter:
-
-* **EN / DE** schaltet die Oberfläche zwischen Deutsch und Englisch um. Die
-  Wahl bleibt im Browser (`localStorage`, Schlüssel `ollamaskope-sprache`);
-  ohne Wahl entscheidet die Browsersprache, Deutsch ist der Rückfall.
-* **☀ / ☾** schaltet zwischen dunklem und hellem Design um (`localStorage`,
-  Schlüssel `ollamaskope-thema`). Ohne Wahl gilt die Systemeinstellung
-  (`prefers-color-scheme`).
-
-Die Texte stehen als Schlüssel in `static/app.js` (`TEXTE`), das HTML trägt
-`data-i18n`-Attribute. Ein neuer Text gehört in **beide** Tabellen – sonst
-zeigt die englische Fassung den Schlüssel selbst an.
-
 ## Konfiguration (`config.json`)
 
 ```json
@@ -292,10 +271,15 @@ cd ~/ollamaskope
 python3 -m unittest discover -s tests -v
 ```
 
-Zurzeit sind es 39 Tests.
+Zurzeit sind es 40 Tests.
 
 ## Lizenz
 
-GPL-3.0-or-later – vollständiger Text in [LICENSE](LICENSE), Weitergabe ohne
-jede Gewährleistung. Es gibt keine Anmeldung: wer `bind: 0.0.0.0` setzt,
-entscheidet damit selbst, wer Modelle löschen darf.
+Copyright (C) 2026 Olav Surawski (o-valo).
+
+AGPL-3.0-or-later — siehe LICENSE.
+Powered by AI
+
+Dieses Projekt wurde mit Unterstützung KI-gestützter Werkzeuge für die Codeänderungen und die Dokumentation entwickelt. Der Code, die Tests und die Architekturentscheidungen stammen von einer menschlich verantwortlichen Person; für verbleibende Fehler ist entsprechend das Projekt verantwortlich.
+
+Die eingesetzten Modelle werden nicht namentlich genannt. Die verwendeten Werkzeuge haben keinen Einfluss auf die Lizenz: Das Projekt steht weiterhin unter AGPL-3.0-or-later (siehe Lizenz).

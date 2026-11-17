@@ -1,16 +1,11 @@
-# Ollamaskope – model list of an Ollama endpoint as a web tool
+German: [README.ger.md](README.ger.md)
 
-> Until 17 Nov 2026 this tool was called `ollama-sort`. Directory, program and
-> shortcut are now `ollamaskope`; the old configuration files
-> `ollama-sort.conf` / `ollama-sort.env` and the old `OLLAMA_SORT_*`
-> environment variables keep working.
+# Ollamaskope – model list of an Ollama endpoint as a web tool
 
 Shows the models of a remote (or local) Ollama endpoint, turns any model into a
 portable Modelfile, builds a new model from it, deletes models and rolls one out
 onto another endpoint. Pure Python 3 (standard library), no Flask, no
 Node dependencies – the same pattern as `~/wg-watcher/wg-http.py`.
-
-German original: [README.ger.md](README.ger.md)
 
 The tool does not run inference and therefore does not belong on an inference
 host. It only talks to the Ollama API over HTTP.
@@ -177,21 +172,6 @@ Weights never travel between two hosts: Ollama offers no endpoint for blob
 downloads. Without file access (SSH/scp, a shared directory) a model built from
 a GGUF file cannot be moved at all.
 
-## Language and theme
-
-Two small switches sit in the top right:
-
-* **EN / DE** switches the interface between German and English. The choice is
-  kept in the browser (`localStorage`, key `ollamaskope-sprache`); without a
-  choice the browser language decides, with German as fallback.
-* **☀ / ☾** switches between the dark and the light theme (`localStorage`, key
-  `ollamaskope-thema`). Without a choice the system setting applies
-  (`prefers-color-scheme`).
-
-The texts live as keys in `static/app.js` (`TEXTE`); the HTML carries
-`data-i18n` attributes. A new text belongs in **both** tables – otherwise the
-English version shows the key itself.
-
 ## Configuration (`config.json`)
 
 ```json
@@ -204,7 +184,9 @@ English version shows the key itself.
      "url": "http://10.0.0.24:11434", "schreiben": true}
   ]
 }
-```* `schreiben: false` locks create, delete and rolling out for that endpoint; the
+```
+
+* `schreiben: false` locks create, delete and rolling out for that endpoint; the
 UI disables the buttons and the server answers 403.
 * Read-only by default: **ollama-2** (a model stays loaded there permanently,
   deleting it would break work in progress) and **ollama-3** (experiments in progress).
@@ -280,10 +262,19 @@ cd ~/ollamaskope
 python3 -m unittest discover -s tests -v
 ```
 
-There are 39 tests at the moment.
+There are 40 tests at the moment.
 
 ## License
 
-GPL-3.0-or-later – full text in [LICENSE](LICENSE), distributed without any
-warranty. There is no login: whoever sets `bind: 0.0.0.0` decides who may
-delete models.
+Copyright (C) 2026 Olav Surawski (o-valo).
+
+AGPL-3.0-or-later — see LICENSE.
+Powered by AI
+
+This project was developed with the support of AI-assisted tools for the code
+changes and the documentation. The code, the tests and the architecture
+decisions come from a human being who is responsible for them; remaining
+defects are the responsibility of the project.
+
+The models used are not named. The tools used have no influence on the licence:
+the project remains under AGPL-3.0-or-later (see License).
