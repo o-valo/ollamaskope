@@ -1,0 +1,24 @@
+# Laufzeitkonfiguration (echte Endpunkte, private Adressen)
+config.json
+ollamaskope.conf
+ollamaskope.env
+ollama-sort.conf
+ollama-sort.env
+
+# Protokolle und PID-Dateien
+*.log
+*.pid
+
+# Bauteile von paket-bauen.sh
+static/*.tar.gz
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Editor / OS
+.DS_Store
+*.swp

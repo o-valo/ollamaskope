@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ollamaskope</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="kopf">
+    <div>
+      <h1>Ollamaskope</h1>
+      <p class="unter">Das Fernrohr für Ollama: Modelle ansehen, Modelfile bauen,
+        laden, erzeugen und löschen.</p>
+    </div>
+    <div class="steuerung">
+      <label for="endpunkt">Endpunkt</label>
+      <select id="endpunkt"></select>
+      <button id="endpunkte-verwalten" class="knopf" type="button">＋ Endpunkt</button>
+      <button id="aktualisieren" class="knopf">Aktualisieren</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="karte">
+      <div class="karte-kopf">
+        <h2>Modelle <span id="anzahl" class="zaehler"></span></h2>
+        <div class="rechts">
+          <span id="endpunkt-status" class="status">–</span>
+          <input id="filter" type="search" placeholder="filtern …" autocomplete="off">
+        </div>
+      </div>
+      <p id="liste-fehler" class="fehler" hidden></p>
+      <p id="liste-hinweis" class="hinweis" hidden></p>
+      <div class="tabelle-rahmen">
+        <table>
+          <thead>
+            <tr>
+              <th class="aktionen">Aktionen</th>
+              <th data-sort="name"><button class="sort-knopf" type="button" data-sort="name" title="Alphabetisch sortieren">Modell</button></th>
+              <th data-sort="groesse"><button class="sort-knopf" type="button" data-sort="groesse" title="Nach Größe sortieren">Größe</button></th>
+              <th data-sort="familie"><button class="sort-knopf" type="button" data-sort="familie" title="Nach Familie sortieren">Familie</button></th>
+              <th data-sort="parameter"><button class="sort-knopf" type="button" data-sort="parameter" title="Nach Parameterzahl sortieren">Parameter</button></th>
+              <th data-sort="quantisierung"><button class="sort-knopf" type="button" data-sort="quantisierung" title="Nach Quantisierung sortieren">Quant</button></th>
+              <th data-sort="geaendert"><button class="sort-knopf" type="button" data-sort="geaendert" title="Nach Änderungsdatum sortieren">geändert</button></th>
+            </tr>
+          </thead>
+          <tbody id="modelle"></tbody>
+        </table>
+      </div>
+      <p id="leer" class="leer" hidden></p>
+    </section>
+
+    <details class="karte" id="modelfile-karte" open>
+      <summary class="karte-kopf">
+        <h2>Modelfile <span id="modelfile-name" class="zaehler"></span></h2>
+      </summary>
+      <div class="karte-inhalt">
+        <div class="karten-knoepfe">
+          <button id="modell-ausrollen" class="knopf klein" type="button" hidden disabled>⇄ Ausrollen</button>
+          <button id="modell-loeschen" class="knopf klein gefahr-leise" type="button" hidden disabled>🗑 Löschen</button>
+          <button id="kopieren" class="knopf klein" type="button">Kopieren</button>
+          <button id="herunterladen" class="knopf klein" type="button">Als Datei</button>
+        </div>
+        <p id="modelfile-hinweis" class="hinweis">
+          Bei einem Modell auf „Modelfile“ klicken, um es hier zu bearbeiten.
+        </p>
+        <ul id="warnungen" class="warnungen" hidden></ul>
+        <textarea id="modelfile" spellcheck="false"
+          placeholder="FROM qwen3.5:9b&#10;PARAMETER num_ctx 32768&#10;SYSTEM &quot;&quot;&quot;Du bist …&quot;&quot;&quot;"></textarea>
+        <div class="erzeugen">
+          <label for="neuer-name">Neuer Modellname</label>
+          <input id="neuer-name" autocomplete="off" placeholder="mein-modell:latest">
+          <button id="erzeugen" class="knopf primaer" type="button">Modell erzeugen</button>
+        </div>
+        <p id="schreib-hinweis" class="hinweis" hidden>
+          Dieser Endpunkt ist schreibgeschützt. Erzeugen und Löschen sind gesperrt –
+          in <code>config.json</code> beim Endpunkt <code>"schreiben": true</code> setzen.
+        </p>
+        <pre id="log" class="log" hidden></pre>
+      </div>
+    </details>
+  </main>
+
+  <dialog id="endpunkt-dialog">
+    <h2>Endpunkte</h2>
+    <p class="hinweis" id="ep-hinweis">Wird in <code>config.json</code> gespeichert und gilt sofort.</p>
+    <ul id="endpunkt-liste" class="ep-liste"></ul>
+    <h3>Neuen Endpunkt eintragen</h3>
+    <label for="ep-name">Name</label>
+    <input id="ep-name" autocomplete="off" placeholder="z. B. werkstatt">
+    <label for="ep-url">URL</label>
+    <input id="ep-url" autocomplete="off" spellcheck="false" placeholder="http://10.0.0.50:11434">
+    <label class="ep-zeile" for="ep-schreiben">
+      <input type="checkbox" id="ep-schreiben">
+      Erzeugen und Löschen auf diesem Endpunkt erlauben
+    </label>
+    <p id="ep-fehler" class="fehler" hidden></p>
+    <div class="dialog-knoepfe">
+      <button id="ep-schliessen" class="knopf" type="button">Schließen</button>
+      <button id="ep-hinzufuegen" class="knopf primaer" type="button">Eintragen</button>
+    </div>
+  </dialog>
+
+  <dialog id="ep-weg-dialog">
+    <h2>Endpunkt entfernen?</h2>
+    <p><code id="ep-weg-name"></code> wird aus der Liste und aus <code>config.json</code>
+      entfernt. Modelle auf dem Endpunkt bleiben unberührt.</p>
+    <p id="ep-weg-fehler" class="fehler" hidden></p>
+    <div class="dialog-knoepfe">
+      <button id="ep-weg-abbrechen" class="knopf" type="button">Abbrechen</button>
+      <button id="ep-weg-ja" class="knopf gefahr" type="button">Ja, entfernen</button>
+    </div>
+  </dialog>
+
+  <dialog id="abh-dialog">
+    <h2>Abhängigkeiten</h2>
+    <p class="unter"><code id="abh-modell"></code></p>
+    <p id="abh-status" class="hinweis">prüfe die Modelfiles …</p>
+    <div id="abh-inhalt"></div>
+    <div class="dialog-knoepfe">
+      <button id="abh-loeschen" class="knopf gefahr-leise" type="button">Dieses Modell löschen</button>
+      <button id="abh-schliessen" class="knopf" type="button">Schließen</button>
+    </div>
+  </dialog>
+
+  <dialog id="loeschen-dialog">
+    <h2>Modell wirklich löschen?</h2>
+    <p>Das Modell <code id="loeschen-modell"></code> wird mit seinen Dateien vom
+      Endpunkt entfernt. Das lässt sich nicht rückgängig machen.</p>
+    <p id="loeschen-fehler" class="fehler" hidden></p>
+    <div class="dialog-knoepfe">
+      <button id="loeschen-abbrechen" class="knopf" type="button">Abbrechen</button>
+      <button id="loeschen-ja" class="knopf gefahr" type="button">Ja, löschen</button>
+    </div>
+  </dialog>
+
+  <dialog id="ausroll-dialog">
+    <h2>Modell ausrollen</h2>
+    <p class="unter"><code id="ausroll-modell"></code> von <span id="ausroll-quelle"></span></p>
+    <p class="hinweis">Übertragen wird das Rezept – Basis, Parameter, Template und
+      Systemtext. Die Gewichte bleiben, wo sie sind: die Basis muss auf dem Ziel liegen.</p>
+    <label for="ausroll-ziel">Ziel-Endpunkt</label>
+    <select id="ausroll-ziel"></select>
+    <label for="ausroll-name">Name auf dem Ziel</label>
+    <input id="ausroll-name" autocomplete="off" spellcheck="false">
+    <label class="ep-zeile" for="ausroll-basis">
+      <input type="checkbox" id="ausroll-basis">
+      Fehlende Basis dort ziehen (lädt sie aus der Registry, kann mehrere GB sein)
+    </label>
+    <label for="ausroll-datei">GGUF-Pfad auf dem Ziel <span class="unter">(nur GGUF-Modelle, optional)</span></label>
+    <input id="ausroll-datei" autocomplete="off" spellcheck="false"
+           placeholder="leer lassen, wenn die Datei dort gleich heißt">
+    <p id="ausroll-fehler" class="fehler" hidden></p>
+    <div class="dialog-knoepfe">
+      <button id="ausroll-abbrechen" class="knopf" type="button">Abbrechen</button>
+      <button id="ausroll-ja" class="knopf primaer" type="button">Ausrollen</button>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="/app.js"></script>
+</body>
+</html>

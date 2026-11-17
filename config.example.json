@@ -1,0 +1,26 @@
+{
+  "bind": "127.0.0.1",
+  "port": 8090,
+  "timeout": 25,
+  "gguf": false,
+  "endpunkte": [
+    {
+      "id": "lokal",
+      "name": "lokal (127.0.0.1:11434)",
+      "url": "http://127.0.0.1:11434",
+      "schreiben": true
+    },
+    {
+      "id": "ollama-1",
+      "name": "ollama-1 (10.0.0.24)",
+      "url": "http://10.0.0.24:11434",
+      "schreiben": true
+    },
+    {
+      "id": "ollama-2",
+      "name": "ollama-2 (10.0.0.81)",
+      "url": "http://10.0.0.81:11434",
+      "schreiben": false
+    }
+  ]
+}
