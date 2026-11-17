@@ -112,6 +112,7 @@ const TEXTE = {
     "aktion.entladen": "Entladen",
     "aktion.ladenTitel": "In den Speicher laden (30 Minuten)",
     "aktion.entladenTitel": "Aus dem Speicher nehmen",
+    "aktion.entladenLeer": "Liegt nicht im Speicher – nichts zu entladen",
     "aktion.geladen": "geladen",
     "aktion.abhTitel": "Abhängigkeiten anzeigen",
     "schreib.hinweis": 'Nur lesen: dieser Endpunkt steht in config.json auf "schreiben": false – Erzeugen und Löschen sind gesperrt.',
@@ -245,6 +246,7 @@ const TEXTE = {
     "aktion.entladen": "Unload",
     "aktion.ladenTitel": "Load into memory (30 minutes)",
     "aktion.entladenTitel": "Remove from memory",
+    "aktion.entladenLeer": "Not in memory – nothing to unload",
     "aktion.geladen": "loaded",
     "aktion.abhTitel": "Show dependencies",
     "schreib.hinweis": 'Read only: this endpoint is set to "schreiben": false in config.json – creating and deleting are locked.',
@@ -660,9 +662,12 @@ function zeichnen() {
     const zeile = document.createElement("tr");
     zeile.innerHTML = `
       <td class="aktionen">
-        <button class="knopf klein" type="button" data-aktion="${istGeladen ? "entladen" : "laden"}"
+        <button class="knopf klein" type="button" data-aktion="laden"
           data-modell="${esc(modell.name)}"
-          title="${esc(t(istGeladen ? "aktion.entladenTitel" : "aktion.ladenTitel"))}">${esc(t(istGeladen ? "aktion.entladen" : "aktion.laden"))}</button>
+          title="${esc(t("aktion.ladenTitel"))}">${esc(t("aktion.laden"))}</button>
+        <button class="knopf klein" type="button" data-aktion="entladen"
+          data-modell="${esc(modell.name)}"${istGeladen ? "" : " disabled"}
+          title="${esc(t(istGeladen ? "aktion.entladenTitel" : "aktion.entladenLeer"))}">${esc(t("aktion.entladen"))}</button>
         <button class="knopf klein" type="button" data-aktion="modelfile"
           data-modell="${esc(modell.name)}">Modelfile</button>
       </td>
@@ -747,7 +752,6 @@ async function modelfileLaden(modell) {
     });
     zustand.modelfileModell = modell;
     schreibrechteAnwenden();
-    $("modelfile-karte").open = true;
     $("modelfile").value = daten.modelfile || "";
     $("modelfile-name").textContent = modell;
     $("modelfile-hinweis").textContent = t("mf.hinweis");

@@ -143,14 +143,12 @@ select:focus, input:focus, textarea:focus {
 
 main {
   display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(340px, 2fr);
+  /* Die Modelfile-Karte steht unter der Tabelle, nicht daneben: so bekommt die
+     Liste immer die volle Breite und keine Spalte fällt aus dem Bild. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
   padding: 18px 26px 40px;
   align-items: start;
-}
-
-@media (max-width: 1080px) {
-  main { grid-template-columns: minmax(0, 1fr); }
 }
 
 .karte {
@@ -266,7 +264,15 @@ td {
 }
 
 tbody tr:hover { background: var(--zeile-hover); }
-td.modell { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+td.modell {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Der Modellname ist das breiteste Feld. Ohne Umbruch macht er die Tabelle
+     breiter als ihre Spalte, und Größe, Familie, Parameter, Quant und
+     geändert liegen rechts außerhalb des sichtbaren Bereichs – sie wirken
+     dann wie verschwunden. Umbruch hält alle Spalten im Bild. */
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 
 .aktionen { text-align: left; }
 td.aktionen { white-space: nowrap; padding-right: 14px; }
