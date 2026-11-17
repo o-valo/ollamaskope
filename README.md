@@ -9,7 +9,7 @@ German: [README.ger.md](README.ger.md)
 Shows the models of a remote (or local) Ollama endpoint, turns any model into a
 portable Modelfile, builds a new model from it, deletes models and rolls one out
 onto another endpoint. Pure Python 3 (standard library), no Flask, no
-Node dependencies – the same pattern as `~/wg-watcher/wg-http.py`.
+Node dependencies.
 
 The tool does not run inference and therefore does not belong on an inference
 host. It only talks to the Ollama API over HTTP.
