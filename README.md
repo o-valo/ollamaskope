@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="ollamaskope.jpg" alt="Ollamaskope V.1.0.0 " width="100%">
+</p>
+
 German: [README.ger.md](README.ger.md)
 
 # Ollamaskope – model list of an Ollama endpoint as a web tool
