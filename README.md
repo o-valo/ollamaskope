@@ -282,3 +282,9 @@ defects are the responsibility of the project.
 
 The models used are not named. The tools used have no influence on the licence:
 the project remains under AGPL-3.0-or-later (see License).
+
+## Screenshot
+
+<p align="center">
+  <img src="screen.jpg" alt="Ollamaskope – model list of an Ollama endpoint in the browser" width="100%">
+</p>

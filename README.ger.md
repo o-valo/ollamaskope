@@ -287,3 +287,9 @@ Powered by AI
 Dieses Projekt wurde mit Unterstützung KI-gestützter Werkzeuge für die Codeänderungen und die Dokumentation entwickelt. Der Code, die Tests und die Architekturentscheidungen stammen von einer menschlich verantwortlichen Person; für verbleibende Fehler ist entsprechend das Projekt verantwortlich.
 
 Die eingesetzten Modelle werden nicht namentlich genannt. Die verwendeten Werkzeuge haben keinen Einfluss auf die Lizenz: Das Projekt steht weiterhin unter AGPL-3.0-or-later (siehe Lizenz).
+
+## Bildschirmfoto
+
+<p align="center">
+  <img src="screen.jpg" alt="Ollamaskope – Modelliste eines Ollama-Endpunkts im Browser" width="100%">
+</p>
