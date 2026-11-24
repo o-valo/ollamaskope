@@ -380,6 +380,12 @@ const zustand = {
   sortierung: { feld: null, richtung: "auf" },
 };
 
+// Laufende Nummer der Modellabfragen. Jede neue Ladung zählt hoch; Antworten
+// einer älteren Anfrage werden verworfen. Nötig, weil ein Endpunktwechsel die
+// vorige Anfrage nicht abbricht: kommt deren Antwort später, würde sie sonst
+// die Liste des neuen Endpunkts überschreiben (oder per Fehler leeren).
+let modellAnfrageNr = 0;
+
 function esc(text) {
   return String(text ?? "").replace(/[&<>"']/g, (zeichen) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
@@ -565,18 +571,25 @@ async function endpunktEntfernen() {
 async function modelleLaden() {
   const ep = aktuellerEndpunkt();
   if (!ep) return;
+  const nummer = ++modellAnfrageNr;
   const status = $("endpunkt-status");
   status.textContent = t("status.laedt");
   status.className = "status";
 
+  // Gilt die Antwort noch? Überholte Anfragen (späterer Aufruf oder anderer
+  // Endpunkt) dürfen weder Liste noch Status anfassen – auch nicht im Fehlerfall.
+  const nochAktuell = () => nummer === modellAnfrageNr && zustand.endpunkt === ep.id;
+
   try {
     const daten = await anfrage(`/api/modelle?endpunkt=${encodeURIComponent(ep.id)}`);
+    if (!nochAktuell() || (daten.endpunkt && daten.endpunkt !== zustand.endpunkt)) return;
     zustand.modelle = daten.modelle || [];
     zustand.geladen = new Set((daten.geladen || []).map((eintrag) => eintrag.name));
     status.textContent = t("status.erreichbar", daten.version || "?", zustand.modelle.length);
     status.className = "status ok";
     $("liste-fehler").hidden = true;
   } catch (fehler) {
+    if (!nochAktuell()) return;
     zustand.modelle = [];
     zustand.geladen = new Set();
     status.textContent = t("status.fehler");

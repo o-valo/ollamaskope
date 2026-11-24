@@ -1,5 +1,18 @@
 # Änderungen
 
+## 1.01 – 24.11.2026
+
+Nur die Modelliste im Browser betroffen, am Server und an den API-Pfaden ändert
+sich nichts.
+
+- **Überholte Modellantworten werden verworfen.** Bisher schrieb jede Antwort
+  von `/api/modelle` in dieselbe Liste: Wer während einer langsamen Abfrage den
+  Endpunkt wechselte, konnte die Modelle des alten Endpunkts unter dem neuen
+  sehen, und ein spät eintreffender Fehler leerte die aktuelle Liste. Jede
+  Ladung zählt jetzt eine laufende Nummer hoch; Antwort und Fehler älterer
+  Anfragen werden still verworfen. Zusätzlich wird die vom Server mitgelieferte
+  Endpunkt-Kennung geprüft.
+
 ## 1.00 – 17.11.2026
 
 Erste veröffentlichte Fassung.
