@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="ollamaskope.jpg" alt="Ollamaskope V.1.01 " width="100%">
+  <img src="ollamaskope.jpg" alt="Ollamaskope V.1.0.1 " width="100%">
 </p>
 
 German: [README.ger.md](README.ger.md)

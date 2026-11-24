@@ -52,7 +52,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, urlparse
 from urllib.request import Request, urlopen
 
-VERSION = "1.01"
+VERSION = "1.0.1"
 SCRIPT_DIR = Path(__file__).resolve().parent
 STATIC_DIR = SCRIPT_DIR / "static"
 

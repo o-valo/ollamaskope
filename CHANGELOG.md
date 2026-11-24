@@ -1,6 +1,6 @@
 # Änderungen
 
-## 1.01 – 24.11.2026
+## 1.0.1 – 24.11.2026
 
 Nur die Modelliste im Browser betroffen, am Server und an den API-Pfaden ändert
 sich nichts.
